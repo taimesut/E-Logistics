@@ -1,0 +1,19 @@
+package com.ntt.elogistics.repositories;
+
+import com.ntt.elogistics.models.ImageParcel;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+
+public interface ImageParcelRepository extends JpaRepository<ImageParcel,Long> {
+    @Query(
+            value = "SELECT * FROM t_image_parcel " +
+                    "WHERE parcel_id = :parcelId",
+            nativeQuery = true
+    )
+    List<ImageParcel> findByParcelId(
+            @Param("parcelId") String parcelId
+    );
+}

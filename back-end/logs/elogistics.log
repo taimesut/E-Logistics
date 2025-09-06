@@ -1,0 +1,123 @@
+2025-09-06T12:47:17.723+07:00  INFO 1444 --- [elogistics] [main] c.ntt.elogistics.ElogisticsApplication   : Starting ElogisticsApplication using Java 21.0.8 with PID 1444 (C:\Users\Windows\Desktop\Elogistics\back-end\target\classes started by Windows in C:\Users\Windows\Desktop\Elogistics\back-end)
+2025-09-06T12:47:17.732+07:00  INFO 1444 --- [elogistics] [main] c.ntt.elogistics.ElogisticsApplication   : No active profile set, falling back to 1 default profile: "default"
+2025-09-06T12:47:19.259+07:00  INFO 1444 --- [elogistics] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-06T12:47:19.477+07:00  INFO 1444 --- [elogistics] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 201 ms. Found 7 JPA repository interfaces.
+2025-09-06T12:47:20.450+07:00  INFO 1444 --- [elogistics] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-09-06T12:47:20.475+07:00  INFO 1444 --- [elogistics] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-09-06T12:47:20.475+07:00  INFO 1444 --- [elogistics] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.42]
+2025-09-06T12:47:20.569+07:00  INFO 1444 --- [elogistics] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-09-06T12:47:20.570+07:00  INFO 1444 --- [elogistics] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2774 ms
+2025-09-06T12:47:20.715+07:00  INFO 1444 --- [elogistics] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-09-06T12:47:21.120+07:00  INFO 1444 --- [elogistics] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@2094bf3d
+2025-09-06T12:47:21.123+07:00  INFO 1444 --- [elogistics] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-09-06T12:47:21.266+07:00  INFO 1444 --- [elogistics] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-06T12:47:21.378+07:00  INFO 1444 --- [elogistics] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.18.Final
+2025-09-06T12:47:21.443+07:00  INFO 1444 --- [elogistics] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-09-06T12:47:21.903+07:00  INFO 1444 --- [elogistics] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-06T12:47:22.003+07:00  WARN 1444 --- [elogistics] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-09-06T12:47:22.022+07:00  INFO 1444 --- [elogistics] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.6
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-09-06T12:47:23.077+07:00  INFO 1444 --- [elogistics] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-06T12:47:23.150+07:00  INFO 1444 --- [elogistics] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-06T12:47:23.495+07:00  INFO 1444 --- [elogistics] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-06T12:47:25.819+07:00  INFO 1444 --- [elogistics] [main] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-09-06T12:47:25.820+07:00  WARN 1444 --- [elogistics] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-09-06T12:47:26.326+07:00  WARN 1444 --- [elogistics] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-06T12:47:27.264+07:00  INFO 1444 --- [elogistics] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-09-06T12:47:27.276+07:00  INFO 1444 --- [elogistics] [main] c.ntt.elogistics.ElogisticsApplication   : Started ElogisticsApplication in 10.267 seconds (process running for 10.842)
+2025-09-06T12:48:09.964+07:00  INFO 1444 --- [elogistics] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-09-06T12:48:09.965+07:00  INFO 1444 --- [elogistics] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-09-06T12:48:09.966+07:00  INFO 1444 --- [elogistics] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-09-06T12:55:22.754+07:00  INFO 1444 --- [elogistics] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-09-06T12:55:22.759+07:00  INFO 1444 --- [elogistics] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-09-06T12:55:22.783+07:00  INFO 1444 --- [elogistics] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-06T12:55:22.785+07:00  INFO 1444 --- [elogistics] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-09-06T12:55:22.789+07:00  INFO 1444 --- [elogistics] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-09-06T13:13:59.269+07:00  INFO 9468 --- [elogistics] [main] c.ntt.elogistics.ElogisticsApplication   : Starting ElogisticsApplication using Java 21.0.8 with PID 9468 (C:\Users\Windows\Desktop\Elogistics\back-end\target\classes started by Windows in C:\Users\Windows\Desktop\Elogistics\back-end)
+2025-09-06T13:13:59.272+07:00  INFO 9468 --- [elogistics] [main] c.ntt.elogistics.ElogisticsApplication   : No active profile set, falling back to 1 default profile: "default"
+2025-09-06T13:14:01.348+07:00  INFO 9468 --- [elogistics] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-06T13:14:01.519+07:00  INFO 9468 --- [elogistics] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 162 ms. Found 7 JPA repository interfaces.
+2025-09-06T13:14:02.341+07:00  INFO 9468 --- [elogistics] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-09-06T13:14:02.370+07:00  INFO 9468 --- [elogistics] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-09-06T13:14:02.370+07:00  INFO 9468 --- [elogistics] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.42]
+2025-09-06T13:14:02.437+07:00  INFO 9468 --- [elogistics] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-09-06T13:14:02.437+07:00  INFO 9468 --- [elogistics] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3113 ms
+2025-09-06T13:14:02.541+07:00  INFO 9468 --- [elogistics] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-09-06T13:14:02.919+07:00  INFO 9468 --- [elogistics] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@23b1aa9
+2025-09-06T13:14:02.925+07:00  INFO 9468 --- [elogistics] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-09-06T13:14:03.041+07:00  INFO 9468 --- [elogistics] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-06T13:14:03.133+07:00  INFO 9468 --- [elogistics] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.18.Final
+2025-09-06T13:14:03.185+07:00  INFO 9468 --- [elogistics] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-09-06T13:14:03.581+07:00  INFO 9468 --- [elogistics] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-06T13:14:03.677+07:00  WARN 9468 --- [elogistics] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-09-06T13:14:03.698+07:00  INFO 9468 --- [elogistics] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.6
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-09-06T13:14:04.712+07:00  INFO 9468 --- [elogistics] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-06T13:14:04.765+07:00  INFO 9468 --- [elogistics] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-06T13:14:05.064+07:00  INFO 9468 --- [elogistics] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-06T13:14:07.280+07:00  INFO 9468 --- [elogistics] [main] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-09-06T13:14:07.280+07:00  WARN 9468 --- [elogistics] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-09-06T13:14:07.792+07:00  WARN 9468 --- [elogistics] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-06T13:14:08.696+07:00  INFO 9468 --- [elogistics] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-09-06T13:14:08.707+07:00  INFO 9468 --- [elogistics] [main] c.ntt.elogistics.ElogisticsApplication   : Started ElogisticsApplication in 10.008 seconds (process running for 16.87)
+2025-09-06T13:14:08.972+07:00  INFO 9468 --- [elogistics] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-09-06T13:14:08.972+07:00  INFO 9468 --- [elogistics] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-09-06T13:14:08.972+07:00  INFO 9468 --- [elogistics] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2025-09-06T13:18:20.767+07:00  INFO 9468 --- [elogistics] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-09-06T13:18:20.767+07:00  INFO 9468 --- [elogistics] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-09-06T13:18:20.782+07:00  INFO 9468 --- [elogistics] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-06T13:18:20.798+07:00  INFO 9468 --- [elogistics] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-09-06T13:18:20.798+07:00  INFO 9468 --- [elogistics] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-09-06T13:22:11.619+07:00  INFO 9752 --- [elogistics] [main] c.ntt.elogistics.ElogisticsApplication   : Starting ElogisticsApplication using Java 21.0.8 with PID 9752 (C:\Users\Windows\Desktop\Elogistics\back-end\target\classes started by Windows in C:\Users\Windows\Desktop\Elogistics\back-end)
+2025-09-06T13:22:11.621+07:00  INFO 9752 --- [elogistics] [main] c.ntt.elogistics.ElogisticsApplication   : No active profile set, falling back to 1 default profile: "default"
+2025-09-06T13:22:12.930+07:00  INFO 9752 --- [elogistics] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-06T13:22:13.113+07:00  INFO 9752 --- [elogistics] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 169 ms. Found 7 JPA repository interfaces.
+2025-09-06T13:22:13.988+07:00  INFO 9752 --- [elogistics] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-09-06T13:22:14.018+07:00  INFO 9752 --- [elogistics] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-09-06T13:22:14.018+07:00  INFO 9752 --- [elogistics] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.42]
+2025-09-06T13:22:14.096+07:00  INFO 9752 --- [elogistics] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-09-06T13:22:14.097+07:00  INFO 9752 --- [elogistics] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2421 ms
+2025-09-06T13:22:14.191+07:00  INFO 9752 --- [elogistics] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-09-06T13:22:14.422+07:00  INFO 9752 --- [elogistics] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@589fb74d
+2025-09-06T13:22:14.425+07:00  INFO 9752 --- [elogistics] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-09-06T13:22:14.543+07:00  INFO 9752 --- [elogistics] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-06T13:22:14.618+07:00  INFO 9752 --- [elogistics] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.18.Final
+2025-09-06T13:22:14.667+07:00  INFO 9752 --- [elogistics] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-09-06T13:22:15.048+07:00  INFO 9752 --- [elogistics] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-06T13:22:15.121+07:00  WARN 9752 --- [elogistics] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-09-06T13:22:15.145+07:00  INFO 9752 --- [elogistics] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.6
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-09-06T13:22:16.362+07:00  INFO 9752 --- [elogistics] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-06T13:22:16.415+07:00  INFO 9752 --- [elogistics] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-06T13:22:16.724+07:00  INFO 9752 --- [elogistics] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-06T13:22:19.002+07:00  INFO 9752 --- [elogistics] [main] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-09-06T13:22:19.003+07:00  WARN 9752 --- [elogistics] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-09-06T13:22:19.625+07:00  WARN 9752 --- [elogistics] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-06T13:22:20.945+07:00  INFO 9752 --- [elogistics] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-09-06T13:22:20.985+07:00  INFO 9752 --- [elogistics] [main] c.ntt.elogistics.ElogisticsApplication   : Started ElogisticsApplication in 10.036 seconds (process running for 10.556)
+2025-09-06T13:22:27.382+07:00  INFO 9752 --- [elogistics] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-09-06T13:22:27.382+07:00  INFO 9752 --- [elogistics] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-09-06T13:22:27.384+07:00  INFO 9752 --- [elogistics] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-09-06T13:25:05.498+07:00  INFO 9752 --- [elogistics] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-09-06T13:25:05.498+07:00  INFO 9752 --- [elogistics] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-09-06T13:25:05.519+07:00  INFO 9752 --- [elogistics] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-06T13:25:05.519+07:00  INFO 9752 --- [elogistics] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-09-06T13:25:05.535+07:00  INFO 9752 --- [elogistics] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
