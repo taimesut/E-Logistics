@@ -1,6 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
+import { Table, Card, Typography, Spin } from 'antd';
 import PublicApi from "./PublicApi.js";
-import Spinner from "../../componets/Spinner.jsx";
+
+const { Title } = Typography;
 
 const ShippingRulePage = () => {
     const [rules, setRules] = useState([]);
@@ -20,38 +22,51 @@ const ShippingRulePage = () => {
         }
         fetchData();
     }, []);
-    if(isLoading){
-        return <Spinner />;
-    }
+
+    const columns = [
+        {
+            title: 'Trọng lượng (Kg)',
+            dataIndex: 'weightRange',
+            key: 'weightRange',
+            render: (_, record, index) => {
+                const isExtra = index === rules.length - 1;
+                return isExtra
+                    ? `Trên ${record.minWeight} kg, thêm mỗi kg`
+                    : `${record.minWeight} - ${record.maxWeight} kg`;
+            }
+        },
+        {
+            title: 'Nội tỉnh (VNĐ)',
+            dataIndex: 'noiTinh',
+            key: 'noiTinh',
+            render: (value) => value.toLocaleString() + ' ₫'
+        },
+        {
+            title: 'Liên tỉnh (VNĐ)',
+            dataIndex: 'lienTinh',
+            key: 'lienTinh',
+            render: (value) => value.toLocaleString() + ' ₫'
+        }
+    ];
 
     return (
-        <div className="container mt-4">
-            <h2 className="text-center mb-4">Bảng Giá Vận Chuyển</h2>
-            <table className="table table-bordered table-striped">
-                <thead className="table-dark">
-                <tr>
-                    <th>Trọng lượng (Kg)</th>
-                    <th>Nội tỉnh (VNĐ)</th>
-                    <th>Liên tỉnh (VNĐ)</th>
-                </tr>
-                </thead>
-                <tbody>
-                {rules.map((rule, index) => {
-                    const isExtra = index === rules.length - 1;
-                    return (
-                        <tr key={rule.id}>
-                            <td>
-                                {isExtra
-                                    ? `Trên ${rule.minWeight} kg, thêm mỗi kg`
-                                    : `${rule.minWeight} - ${rule.maxWeight} kg`}
-                            </td>
-                            <td>{rule.noiTinh.toLocaleString()} ₫</td>
-                            <td>{rule.lienTinh.toLocaleString()} ₫</td>
-                        </tr>
-                    );
-                })}
-                </tbody>
-            </table>
+        <div style={{ padding: '40px', display: 'flex', justifyContent: 'center', background: '#f5f5f5' }}>
+            <Card style={{ width: '100%', maxWidth: 800 }}>
+                <Title level={3} style={{ textAlign: 'center', marginBottom: 24 }}>Bảng Giá Vận Chuyển</Title>
+                {isLoading ? (
+                    <div style={{ textAlign: 'center', padding: 50 }}>
+                        <Spin size="large" />
+                    </div>
+                ) : (
+                    <Table
+                        dataSource={rules}
+                        columns={columns}
+                        rowKey="id"
+                        pagination={false}
+                        bordered
+                    />
+                )}
+            </Card>
         </div>
     );
 };

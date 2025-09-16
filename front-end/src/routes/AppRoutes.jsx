@@ -1,61 +1,66 @@
 import React from 'react';
 import {Route, Routes} from "react-router-dom";
 import HomePage from "../pages/public/HomePage.jsx";
-import LoginPage from "../pages/public/LoginPage.jsx";
-import RegisterPage from "../pages/public/RegisterPage.jsx";
+import LoginPage from "../pages/public/auth/LoginPage.jsx";
+import RegisterPage from "../pages/public/auth/RegisterPage.jsx";
 import RequireRole from "./RequireRole.jsx";
-import CustomerParcelNewPage from "../pages/customer/CustomerParcelNewPage.jsx";
 import TrackingPage from "../pages/public/TrackingPage.jsx";
 import PublicLayout from "../pages/public/PublicLayout.jsx";
 import AdminHomePage from "../pages/admin/AdminHomePage.jsx";
 import ManagerLayout from "../pages/manager/ManagerLayout.jsx";
 import AdminLayout from "../pages/admin/AdminLayout.jsx";
 import ManagerHomePage from "../pages/manager/ManagerHomePage.jsx";
-import RequireNotAuthenticatied from "./RequireNotAuthenticatied.jsx";
+import RequireNotAuthenticated from "./RequireNotAuthenticated.jsx";
 import {ToastContainer} from "react-toastify";
 import CustomerLayout from "../pages/customer/CustomerLayout.jsx";
-import Logout from "../pages/public/Logout.jsx";
+import Logout from "../pages/public/auth/Logout.jsx";
 import CustomerHomePage from "../pages/customer/CustomerHomePage.jsx";
-import NotFoundPage from "../pages/public/NotFoundPage.jsx";
-import CustomerParcelPage from "../pages/customer/CustomerParcelPage.jsx";
-import AdminBranchPage from "../pages/admin/AdminBranchPage.jsx";
-import AdminCreateBranchPage from "../pages/admin/AdminCreateBranch.jsx";
-import AdminDetailBranchPage from "../pages/admin/AdminDetailBranchPage.jsx";
-import AdminAccountPage from "../pages/admin/AdminAccountPage.jsx";
-import AdminCreateAccountPage from "../pages/admin/AdminCreateAccountPage.jsx";
-import AdminDetailAccountPage from "../pages/admin/AdminDetailAccountPage.jsx";
+import NotFoundPage from "../pages/public/page-direction/NotFoundPage.jsx";
 import ShipperLayout from "../pages/shipper/ShipperLayout.jsx";
 import ShipperHomePage from "../pages/shipper/ShipperHomePage.jsx";
-import ShipperParcelPage from "../pages/shipper/ShipperParcelPage.jsx";
-
-import MapDirections from "../componets/MapDirections.jsx";
-import ShipperMapDirection from "../pages/shipper/ShipperMapDirection.jsx";
-import ShipperMapMarkersPage from "../pages/shipper/ShipperMapMarkersPage.jsx";
-import CustomerParcelDetailPage from "../pages/customer/CustomerParcelDetailPage.jsx";
-import ShipperDetailParcelPage from "../pages/shipper/ShipperDetailParcelPage.jsx";
-import ShipperMapMarkerPage from "../pages/shipper/ShipperMapMarkerPage.jsx";
-import ManagerParcelPage from "../pages/manager/ManagerParcelPage.jsx";
-import ManagerParcelDetailPage from "../pages/manager/ManagerParcelDetailPage.jsx";
-import ResetPasswordPage from "../pages/public/ResetPasswordPage.jsx";
+import ShipperMapDirection from "../pages/shipper/map/ShipperMapDirection.jsx";
+import ShipperMapMarkersPage from "../pages/shipper/map/ShipperMapMarkersPage.jsx";
+import ShipperMapMarkerPage from "../pages/shipper/map/ShipperMapMarkerPage.jsx";
+import ResetPasswordPage from "../pages/public/auth/ResetPasswordPage.jsx";
 import ProfilePage from "../pages/public/ProfilePage.jsx";
 import CheckFeePage from "../pages/public/CheckFeePage.jsx";
 import AdminShippingRulePage from "../pages/admin/AdminShippingRulePage.jsx";
 import ShippingRulePage from "../pages/public/ShippingRulePage.jsx";
-import CustomerStatisticPage from "../pages/customer/CustomerStatisticPage.jsx";
-import ShipperStatisticPage from "../pages/shipper/ShipperStatisticPage.jsx";
-import AdminStatisticPage from "../pages/admin/AdminStatisticPage.jsx";
-import ManagerStatisticPage from "../pages/manager/ManagerStatisticPage.jsx";
+import CustomerParcelGetAll from "../pages/customer/parcel/CustomerParcelGetAll.jsx";
+import CustomerParcelCreate from "../pages/customer/parcel/CustomerParcelCreate.jsx";
+import CustomerParcelDetail from "../pages/customer/parcel/CustomerParcelDetail.jsx";
+import CustomerProductDetail from "../pages/customer/product/CustomerProductDetail.jsx";
+import CustomerProductUpdate from "../pages/customer/product/CustomerProductUpdate.jsx";
+import CustomerProductGetAll from "../pages/customer/product/CustomerProductGetAll.jsx";
+import CustomerProductCreate from "../pages/customer/product/CustomerProductCreate.jsx";
+import ManagerParcelGetAll from "../pages/manager/parcel/ManagerParcelGetAll.jsx";
+import AdminBranchGetAll from "../pages/admin/branch/AdminBranchGetAll.jsx";
+import AdminBranchDetail from "../pages/admin/branch/AdminBranchDetail.jsx";
+import AdminBranchUpdate from "../pages/admin/branch/AdminBranchUpdate.jsx";
+import AdminBranchCreate from "../pages/admin/branch/AdminBranchCreate.jsx";
+import AdminAccountGetAll from "../pages/admin/account/AdminAccountGetAll.jsx";
+import AdminAccountDetail from "../pages/admin/account/AdminAccountDetail.jsx";
+import AdminAccountUpdate from "../pages/admin/account/AdminAccountUpdate.jsx";
+import AdminAccountCreate from "../pages/admin/account/AdminAccountCreate.jsx";
+import ManagerParcelDetail from "../pages/manager/parcel/ManagerParcelDetail.jsx";
+import ShipperParcelGetAll from "../pages/shipper/parcel/ShipperParcelGetAll.jsx";
+import ShipperParcelDetail from "../pages/shipper/parcel/ShipperParcelDetail.jsx";
+import CustomerStats from "../pages/customer/CustomerStats.jsx";
+import ShipperStats from "../pages/shipper/ShipperStats.jsx";
+import AdminStats from "../pages/admin/AdminStats.jsx";
+import ManagerStats from "../pages/manager/ManagerStats.jsx";
+import ComingSoonPage from "../pages/public/page-direction/ComingSoonPage.jsx";
+
+
 
 const AppRoutes = () => {
     return (
         <>
             <Routes>
-                <Route path="/map" element={<MapDirections/>} />
-
                 {/*guest*/}
                 <Route element={<PublicLayout />}>
 
-                    <Route element={<RequireNotAuthenticatied/>}>
+                    <Route element={<RequireNotAuthenticated/>}>
                         <Route path="/login" element={<LoginPage/>} />
                         <Route path="/register" element={<RegisterPage/>} />
                         <Route path="/reset-password" element={<ResetPasswordPage/>} />
@@ -74,12 +79,17 @@ const AppRoutes = () => {
 
                         <Route path="/customer" element={<CustomerHomePage/>} />
 
-                        <Route path="/customer/parcel" element={<CustomerParcelPage/>} />
-                        <Route path="/customer/create-parcel" element={<CustomerParcelNewPage/>} />
-                        <Route path="/customer/parcel/:id" element={<CustomerParcelDetailPage/>} />
+                        <Route path="/customer/parcel" element={<CustomerParcelGetAll/>} />
+                        <Route path="/customer/create-parcel" element={<CustomerParcelCreate/>} />
+                        <Route path="/customer/parcel/:id" element={<CustomerParcelDetail/>} />
+
+                        <Route path="/customer/product/:id" element={<CustomerProductDetail/>} />
+                        <Route path="/customer/product/edit/:id" element={<CustomerProductUpdate/>} />
+                        <Route path="/customer/product" element={<CustomerProductGetAll/>} />
+                        <Route path="/customer/create-product" element={<CustomerProductCreate/>} />
 
                         <Route path="/customer/tracking" element={<TrackingPage/>} />
-                        <Route path="/customer/stats" element={<CustomerStatisticPage/>} />
+                        <Route path="/customer/stats" element={<CustomerStats/>} />
                     </Route>
                 </Route>
 
@@ -89,12 +99,14 @@ const AppRoutes = () => {
                         <Route path="/shipper/profile" element={<ProfilePage/>} />
 
                         <Route path="/shipper" element={<ShipperHomePage/>} />
-                        <Route path="/shipper/parcel" element={<ShipperParcelPage/>} />
-                        <Route path="/shipper/parcel/:id" element={<ShipperDetailParcelPage/>} />
+
+                        <Route path="/shipper/parcel" element={<ShipperParcelGetAll/>} />
+                        <Route path="/shipper/parcel/:id" element={<ShipperParcelDetail/>} />
+
                         <Route path="/shipper/map-direction" element={<ShipperMapDirection/>} />
                         <Route path="/shipper/map-markers" element={<ShipperMapMarkersPage/>} />
                         <Route path="/shipper/map-marker" element={<ShipperMapMarkerPage/>} />
-                        <Route path="/shipper/stats" element={<ShipperStatisticPage/>} />
+                        <Route path="/shipper/stats" element={<ComingSoonPage/>} />
 
                     </Route>
                 </Route>
@@ -108,17 +120,19 @@ const AppRoutes = () => {
                         <Route path="/admin" element={<AdminHomePage/>} />
 
                         {/*branch*/}
-                        <Route path="/admin/branch" element={<AdminBranchPage/>} />
-                        <Route path="/admin/branch/:id" element={<AdminDetailBranchPage/>} />
-                        <Route path="/admin/create-branch" element={<AdminCreateBranchPage/>} />
+                        <Route path="/admin/create-branch" element={<AdminBranchCreate/>} />
+                        <Route path="/admin/branch" element={<AdminBranchGetAll/>} />
+                        <Route path="/admin/branch/:id" element={<AdminBranchDetail/>} />
+                        <Route path="/admin/branch/edit/:id" element={<AdminBranchUpdate/>} />
 
                         {/*staff*/}
-                        <Route path="/admin/account" element={<AdminAccountPage/>} />
-                        <Route path="/admin/account/:id" element={<AdminDetailAccountPage/>} />
-                        <Route path="/admin/create-account" element={<AdminCreateAccountPage/>} />
+                        <Route path="/admin/account" element={<AdminAccountGetAll/>} />
+                        <Route path="/admin/account/:id" element={<AdminAccountDetail/>} />
+                        <Route path="/admin/account/edit/:id" element={<AdminAccountUpdate/>} />
+                        <Route path="/admin/create-account" element={<AdminAccountCreate/>} />
 
                         <Route path="/admin/shipping-rule" element={<AdminShippingRulePage/>} />
-                        <Route path="/admin/stats" element={<AdminStatisticPage/>} />
+                        <Route path="/admin/stats" element={<ComingSoonPage/>} />
 
                     </Route>
                 </Route>
@@ -130,9 +144,9 @@ const AppRoutes = () => {
                         <Route path="/manager/profile" element={<ProfilePage/>} />
 
                         <Route path="/manager" element={<ManagerHomePage/>} />
-                        <Route path="/manager/parcel/:id" element={<ManagerParcelDetailPage/>} />
-                        <Route path="/manager/parcel" element={<ManagerParcelPage/>} />
-                        <Route path="/manager/stats" element={<ManagerStatisticPage/>} />
+                        <Route path="/manager/parcel/:id" element={<ManagerParcelDetail/>} />
+                        <Route path="/manager/parcel" element={<ManagerParcelGetAll/>} />
+                        <Route path="/manager/stats" element={<ComingSoonPage/>} />
 
                     </Route>
                 </Route>

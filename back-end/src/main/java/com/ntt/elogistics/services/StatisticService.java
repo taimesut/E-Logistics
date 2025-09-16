@@ -1,10 +1,11 @@
 package com.ntt.elogistics.services;
 
-import com.ntt.elogistics.dtos.responses.AdminStatisticResponse;
-import com.ntt.elogistics.dtos.responses.CustomerStatisticResponse;
-import com.ntt.elogistics.dtos.responses.ManagerStatisticResponse;
-import com.ntt.elogistics.dtos.responses.ShipperStatisticResponse;
+import com.ntt.elogistics.dtos.AdminStatisticResponse;
+import com.ntt.elogistics.dtos.CustomerStatisticResponse;
+import com.ntt.elogistics.dtos.ManagerStatisticResponse;
+import com.ntt.elogistics.dtos.ShipperStatisticResponse;
 import com.ntt.elogistics.enums.UserRole;
+import com.ntt.elogistics.exceptions.NotFoundUsernameException;
 import com.ntt.elogistics.repositories.BranchRepository;
 import com.ntt.elogistics.repositories.ParcelRepository;
 import com.ntt.elogistics.repositories.UserRepository;
@@ -12,7 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,92 +26,31 @@ public class StatisticService {
     private final UserRepository userRepository;
     private final BranchRepository branchRepository;
 
-    public CustomerStatisticResponse statisticCustomer(Authentication authentication) {
-        String userId = String.valueOf(userRepository.findIdByUsername(authentication.getName()).get());
-        long totalParcels = parcelRepository.countByUserId(userId);
-
-        Map<String, Long> statusCount = parcelRepository.countByStatus(userId).stream()
-                .collect(Collectors.toMap(
-                        row -> row[0].toString(),   // status
-                        row -> (Long) row[1]        // count
-                ));
-
-        double totalShippingFee = parcelRepository.totalShippingFee(userId);
-
-        return CustomerStatisticResponse.builder()
-                .totalParcels(totalParcels)
-                .statusCount(statusCount)
-                .totalShippingFee(totalShippingFee)
-                .build();
+    public String getUserIdToStringFromAuthentication(Authentication authentication) {
+        return userRepository.findIdByUsername(authentication.getName())
+                .orElseThrow(NotFoundUsernameException::new)
+                .toString();
     }
 
-    public ShipperStatisticResponse statisticShipper(Authentication authentication) {
-        String shipperId = String.valueOf(userRepository.findIdByUsername(authentication.getName()).get());
-
-        long totalParcels = parcelRepository.countByShipper(shipperId);
-
-        Map<String, Long> statusCount = parcelRepository.countByStatusForShipper(shipperId).stream()
-                .collect(Collectors.toMap(
-                        row -> row[0].toString(),
-                        row -> (Long) row[1]
-                ));
-
-        long successParcels = statusCount.getOrDefault("DELIVERED", 0L);
-        long failedParcels = statusCount.getOrDefault("CANCELLED", 0L);
-
-        return ShipperStatisticResponse.builder()
-                .totalParcels(totalParcels)
-                .statusCount(statusCount)
-                .successParcels(successParcels)
-                .failedParcels(failedParcels)
-                .build();
+    public String getBranchWorkFromAuthentication(Authentication authentication) {
+        return userRepository.findBranchWorkIdByUsername(authentication.getName());
+    }
+    public List<Object[]> customer (LocalDateTime start, LocalDateTime end, Authentication authentication){
+        return parcelRepository.statsCustomer(getUserIdToStringFromAuthentication(authentication),start,end);
     }
 
-    public ManagerStatisticResponse statisticManager(Authentication authentication) {
-        String branchId = userRepository.findBranchWorkIdByUsername(authentication.getName());
-        long totalParcels = parcelRepository.countByBranch(branchId);
-
-        Map<String, Long> statusCount = parcelRepository.countByStatusForBranch(branchId).stream()
-                .collect(Collectors.toMap(
-                        row -> row[0].toString(),   // status
-                        row -> (Long) row[1]        // count
-                ));
-
-        double totalRevenue = parcelRepository.totalRevenue(branchId);
-        long activeShippers = userRepository.countActiveShippers(branchId);
-
-        return ManagerStatisticResponse.builder()
-                .totalParcels(totalParcels)
-                .statusCount(statusCount)
-                .totalRevenue(totalRevenue)
-                .activeShippers(activeShippers)
-                .build();
+    public Map<String,Long> shipper (Authentication authentication){
+        return null;
     }
 
-    public AdminStatisticResponse statisticAdmin() {
-        long totalCustomers = userRepository.countByRole(UserRole.ROLE_CUSTOMER);
-        long totalShippers = userRepository.countByRole(UserRole.ROLE_SHIPPER);
-        long totalManagers = userRepository.countByRole(UserRole.ROLE_MANAGER);
-        long totalBranches = branchRepository.count();
-        long totalParcels = parcelRepository.count();
-
-        Map<String, Long> statusCount = parcelRepository.countParcelsByStatus().stream()
-                .collect(Collectors.toMap(
-                        row -> row[0].toString(),
-                        row -> (Long) row[1]
-                ));
-
-        double totalRevenue = parcelRepository.totalRevenue();
-
-        return AdminStatisticResponse.builder()
-                .totalCustomers(totalCustomers)
-                .totalShippers(totalShippers)
-                .totalManagers(totalManagers)
-                .totalBranches(totalBranches)
-                .totalParcels(totalParcels)
-                .statusCount(statusCount)
-                .totalRevenue(totalRevenue)
-                .build();
+    public Map<String,Long> manager (Authentication authentication){
+        return null;
     }
+
+    public Map<String,Long> admin (Authentication authentication){
+        return null;
+    }
+
+
 
 }

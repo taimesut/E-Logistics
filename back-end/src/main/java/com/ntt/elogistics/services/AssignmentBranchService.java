@@ -13,9 +13,6 @@ public class AssignmentBranchService {
 
     private final BranchRepository branchRepository;
 
-    private final ParcelRepository parcelRepository;
-
-
     public String getFromBranchIdAutoAssignment(Parcel parcel){
         Branch branch = null;
 

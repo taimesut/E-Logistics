@@ -36,7 +36,14 @@ const PublicApi = {
     },
     getImagesParcel(id){
         return AxiosClient.get(`/user/images-parcel?id=${id}`);
-    }
+    },
+    getListUserIdChat(){
+        return AxiosClient.get('/user/list-user-id-chat');
+    },
+    getAdminId(){
+        return AxiosClient.get('/user/chat-with-admin');
+    },
+
 }
 
 export default PublicApi;

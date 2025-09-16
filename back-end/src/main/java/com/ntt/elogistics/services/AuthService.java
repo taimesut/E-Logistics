@@ -1,8 +1,8 @@
 package com.ntt.elogistics.services;
 
-import com.ntt.elogistics.dtos.requests.LoginRequest;
-import com.ntt.elogistics.dtos.responses.LoginResponse;
-import com.ntt.elogistics.dtos.requests.RegisterRequest;
+import com.ntt.elogistics.dtos.LoginRequest;
+import com.ntt.elogistics.dtos.LoginResponse;
+import com.ntt.elogistics.dtos.RegisterRequest;
 import com.ntt.elogistics.enums.UserRole;
 import com.ntt.elogistics.enums.UserStatus;
 import com.ntt.elogistics.exceptions.CustomException;
@@ -70,12 +70,8 @@ public class AuthService {
 
         } catch (BadCredentialsException e) {
             throw new CustomException("Tên đăng nhập hoặc mật khẩu không chính xác", HttpStatus.UNAUTHORIZED);
-        } catch (LockedException e) {
-            throw new CustomException("Tài khoản đã bị khóa", HttpStatus.LOCKED);
-        } catch (DisabledException e) {
-            throw new CustomException("Tài khoản đã bị vô hiệu hóa", HttpStatus.FORBIDDEN);
         } catch (AuthenticationException e) {
-            throw new CustomException("Xác thực tài khoản thất bại", HttpStatus.UNAUTHORIZED);
+            throw new CustomException("Tài khoản đã bị khóa", HttpStatus.UNAUTHORIZED);
         }
     }
 }

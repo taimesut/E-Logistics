@@ -1,7 +1,7 @@
 package com.ntt.elogistics.helpers;
 
 
-import com.ntt.elogistics.dtos.responses.ApiResponse;
+import com.ntt.elogistics.dtos.ApiResponse;
 
 public class ApiResponseFactory {
 

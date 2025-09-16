@@ -1,5 +1,6 @@
 package com.ntt.elogistics.repositories;
 
+import com.ntt.elogistics.dtos.ParcelStatusCountDto;
 import com.ntt.elogistics.enums.ParcelStatus;
 import com.ntt.elogistics.models.Parcel;
 import org.springframework.data.domain.Page;
@@ -8,211 +9,94 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
-public interface ParcelRepository extends JpaRepository<Parcel, Long> {
+public interface ParcelRepository extends JpaRepository<Parcel, UUID> {
 
     @Query("""
             SELECT p FROM Parcel p
-            WHERE p.userId = :userId
-              AND (
-                   LOWER(p.toPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.toName) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.fromPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.fromName) LIKE LOWER(CONCAT('%', :search, '%'))
-              )
-            """)
-    Page<Parcel> findByUserId(@Param("userId") String userId,
-                              @Param("search") String search,
-                              Pageable pageable);
-
-
-    @Query("""
-                    SELECT p FROM Parcel p WHERE p.userId = :userId AND p.status = :status
-                    AND (
-                   LOWER(p.toPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.toName) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.fromPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.fromName) LIKE LOWER(CONCAT('%', :search, '%'))
-              )
-            """)
-    Page<Parcel> findByUserIdAndStatus(@Param("userId") String userId,
-                                       @Param("status") ParcelStatus status,
-                                       @Param("search") String search,
-                                       Pageable pageable);
-
-    @Query("""
-            SELECT p FROM Parcel p WHERE p.fromBranchId = :fromBranchId
+            WHERE
+            (
+                p.userId = :userId OR
+                p.toBranchId = :branchId OR
+                p.fromBranchId = :branchId OR
+                p.pickupShipperId = :userId OR
+                p.deliveryShipperId = :userId
+            )
+            AND (:status IS NULL OR p.status = :status)
             AND (
-                   LOWER(p.toPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.toName) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.fromPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.fromName) LIKE LOWER(CONCAT('%', :search, '%'))
-              )
+            :search IS NULL OR
+            :search = '' OR
+             CAST(p.id AS string) LIKE CONCAT('%', :search, '%') OR
+             LOWER(p.toPhone) LIKE LOWER(CONCAT('%', :search, '%')) OR
+             LOWER(p.toName) LIKE LOWER(CONCAT('%', :search, '%')) OR
+             LOWER(p.fromPhone) LIKE LOWER(CONCAT('%', :search, '%')) OR
+             LOWER(p.fromName) LIKE LOWER(CONCAT('%', :search, '%'))
+            )
             """)
-    Page<Parcel> findByFromBranchId(@Param("fromBranchId") String fromBranchId,
-                                    @Param("search") String search,
-                                    Pageable pageable);
-
-    @Query("""
-            SELECT p FROM Parcel p WHERE p.toBranchId = :toBranchId
-            AND (
-                   LOWER(p.toPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.toName) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.fromPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.fromName) LIKE LOWER(CONCAT('%', :search, '%'))
-              )
-            """)
-    Page<Parcel> findByToBranchId(@Param("toBranchId") String toBranchId,
-                                  @Param("search") String search,
-                                  Pageable pageable);
-
-    //-------------------------------------------------------
-    //manager
-    //pick up
-    @Query("""
-            SELECT p FROM Parcel p WHERE p.fromBranchId = :fromBranchId AND p.status = :status
-            AND (
-                   LOWER(p.toPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.toName) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.fromPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.fromName) LIKE LOWER(CONCAT('%', :search, '%'))
-              )
-            """)
-    Page<Parcel> findByFromBranchIdAndStatus(@Param("fromBranchId") String fromBranchId,
-                                             @Param("status") ParcelStatus status,
-                                             @Param("search") String search,
-                                             Pageable pageable);
-
-    @Query("""
-            SELECT p FROM Parcel p WHERE p.toBranchId = :toBranchId AND p.status = :status
-            AND (
-                   LOWER(p.toPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.toName) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.fromPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.fromName) LIKE LOWER(CONCAT('%', :search, '%'))
-              )
-            """)
-    Page<Parcel> findByToBranchIdAndStatus(@Param("toBranchId") String toBranchId,
-                                           @Param("status") ParcelStatus status,
-                                           @Param("search") String search,
-                                           Pageable pageable);
-
-    //-------------------------------------------------------
-    //shipper
-    //pickup
-    @Query("""
-            SELECT p FROM Parcel p WHERE p.pickupShipperId = :shipperId AND p.status = :status
-            AND (
-                           LOWER(p.toPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                        OR LOWER(p.toName) LIKE LOWER(CONCAT('%', :search, '%'))
-                        OR LOWER(p.fromPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                        OR LOWER(p.fromName) LIKE LOWER(CONCAT('%', :search, '%'))
-                      )
-            """)
-    Page<Parcel> findByPickupShipperIdAndStatus(@Param("shipperId") String shipperId,
-                                                @Param("status") ParcelStatus status,
-                                                @Param("search") String search,
-                                                Pageable pageable);
-
-    @Query("""
-            SELECT p FROM Parcel p WHERE p.pickupShipperId = :shipperId
-            AND (
-                           LOWER(p.toPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                        OR LOWER(p.toName) LIKE LOWER(CONCAT('%', :search, '%'))
-                        OR LOWER(p.fromPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                        OR LOWER(p.fromName) LIKE LOWER(CONCAT('%', :search, '%'))
-                      )
-            """)
-    Page<Parcel> findByPickupShipperId(@Param("shipperId") String shipperId,
-                                       @Param("search") String search,
-                                       Pageable pageable);
-
-    //delivery
-    @Query("""
-            SELECT p FROM Parcel p WHERE p.deliveryShipperId = :shipperId AND p.status = :status
-            AND (
-                   LOWER(p.toPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.toName) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.fromPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.fromName) LIKE LOWER(CONCAT('%', :search, '%'))
-              )
-            """)
-    Page<Parcel> findByDeliveryShipperIdAndStatus(@Param("shipperId") String shipperId,
-                                                  @Param("status") ParcelStatus status,
-                                                  @Param("search") String search,
-                                                  Pageable pageable);
+    Page<Parcel> findAllCustom(@Param("userId") String userId,
+                               @Param("branchId") String branchId,
+                               @Param("search") String search,
+                               @Param("status") ParcelStatus status,
+                               Pageable pageable);
 
 
-    @Query("""
-            SELECT p FROM Parcel p WHERE p.deliveryShipperId = :shipperId
-            AND (
-                   LOWER(p.toPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.toName) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.fromPhone) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(p.fromName) LIKE LOWER(CONCAT('%', :search, '%'))
-              )
-            """)
-    Page<Parcel> findByDeliveryShipperId(@Param("shipperId") String shipperId,
-                                         @Param("search") String search,
-                                         Pageable pageable);
-
-    boolean existsByUserIdAndPickupShipperId(String userId, String shipperId);
-
-    boolean existsByUserIdAndDeliveryShipperId(String userId, String shipperId);
-
-    @Query("SELECT p.status, COUNT(p) " +
+    @Query("SELECT p.status AS status, COUNT(p) AS count " +
             "FROM Parcel p " +
-            "WHERE p.fromBranchId = :branchId OR p.toBranchId = :branchId " +
+            "WHERE p.userId = :userId " +
             "GROUP BY p.status")
-    List<Object[]> countByStatusFromOrToBranch(@Param("branchId") String branchId);
+    List<Object[]> dashboardCustomer(@Param("userId") String userId);
 
-    @Query("SELECT p.status, COUNT(p) " +
+
+    @Query("SELECT p.status AS status, COUNT(p) AS count " +
             "FROM Parcel p " +
-            "WHERE p.pickupShipperId = :shipperId OR p.deliveryShipperId = :shipperId " +
+            "WHERE p.pickupShipperId = :shipperId AND p.status IN :listStatus " +
             "GROUP BY p.status")
-    List<Object[]> countByStatusPickupOrDeliveryShipperId(@Param("shipperId") String branchId);
+    List<Object[]> dashboardShipperPickup(@Param("shipperId") String shipperId,
+                                          @Param("listStatus") List<ParcelStatus> listStatus);
 
-    @Query("SELECT COUNT(p) FROM Parcel p WHERE p.userId = :userId AND p.status = :status")
-    long countParcelsByUserIdAndStatus(@Param("userId") String userId,
-                                     @Param("status") ParcelStatus status);
-
-    @Query("SELECT COUNT(p) FROM Parcel p WHERE p.userId = :userId")
-    long countByUserId(@Param("userId") String userId);
-
-    @Query("SELECT p.status, COUNT(p) FROM Parcel p WHERE p.userId = :userId GROUP BY p.status")
-    List<Object[]> countByStatus(@Param("userId") String userId);
-
-    @Query("SELECT COALESCE(SUM(p.shippingFee), 0) FROM Parcel p WHERE p.userId = :userId")
-    double totalShippingFee(@Param("userId") String userId);
-
-    @Query("SELECT COUNT(p) FROM Parcel p WHERE p.pickupShipperId = :shipperId OR p.deliveryShipperId = :shipperId")
-    long countByShipper(@Param("shipperId") String shipperId);
-
-    @Query("SELECT p.status, COUNT(p) FROM Parcel p " +
-            "WHERE p.pickupShipperId = :shipperId OR p.deliveryShipperId = :shipperId " +
+    @Query("SELECT p.status AS status, COUNT(p) AS count " +
+            "FROM Parcel p " +
+            "WHERE p.deliveryShipperId = :shipperId AND p.status IN :listStatus " +
             "GROUP BY p.status")
-    List<Object[]> countByStatusForShipper(@Param("shipperId") String shipperId);
+    List<Object[]> dashboardShipperDelivery(@Param("shipperId") String shipperId,
+                                          @Param("listStatus") List<ParcelStatus> listStatus);
 
-
-    @Query("SELECT COUNT(p) FROM Parcel p WHERE p.fromBranchId = :branchId OR p.toBranchId = :branchId")
-    long countByBranch(@Param("branchId") String branchId);
-
-    @Query("SELECT p.status, COUNT(p), SUM(p.shippingFee) FROM Parcel p " +
-            "WHERE p.fromBranchId = :branchId OR p.toBranchId = :branchId " +
+    @Query("SELECT p.status AS status, COUNT(p) AS count " +
+            "FROM Parcel p " +
+            "WHERE p.fromBranchId = :branchId AND p.status IN :listStatus " +
             "GROUP BY p.status")
-    List<Object[]> countByStatusForBranch(@Param("branchId") String branchId);
+    List<Object[]> dashboardManagerPickup(@Param("branchId") String branchId,
+                                          @Param("listStatus") List<ParcelStatus> listStatus);
 
-    @Query("SELECT COALESCE(SUM(p.shippingFee), 0) FROM Parcel p WHERE p.fromBranchId = :branchId OR p.toBranchId = :branchId")
-    double totalRevenue(@Param("branchId") String branchId);
+    @Query("SELECT p.status AS status, COUNT(p) AS count " +
+            "FROM Parcel p " +
+            "WHERE p.toBranchId = :branchId AND p.status IN :listStatus " +
+            "GROUP BY p.status")
+    List<Object[]> dashboardManagerDelivery(@Param("branchId") String branchId,
+                                          @Param("listStatus") List<ParcelStatus> listStatus);
 
 
-    @Query("SELECT COUNT(p) FROM Parcel p")
-    long totalParcels();
 
-    @Query("SELECT p.status, COUNT(p) FROM Parcel p GROUP BY p.status")
-    List<Object[]> countParcelsByStatus();
-
-    @Query("SELECT COALESCE(SUM(p.shippingFee), 0) FROM Parcel p")
-    double totalRevenue();
+    @Query(value = """
+        SELECT p.id AS productId,
+            p.name AS productName,
+            SUM(pp.quantity) AS totalQuantity,
+            SUM(pp.quantity * pp.price) AS totalRevenue
+        FROM t_parcel pa
+        JOIN t_product_parcel pp ON CAST(pa.id AS text) = pp.parcel_id
+        JOIN t_product p ON pp.product_id = CAST(p.id AS text)
+        WHERE pa.user_id = :customerId
+          AND pa.status = 'DELIVERED'
+          AND pa.created_at BETWEEN :startDate AND :endDate
+        GROUP BY p.id, p.name
+        ORDER BY totalRevenue DESC
+        """, nativeQuery = true)
+    List<Object[]> statsCustomer(
+            @Param("customerId") String customerId,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 }

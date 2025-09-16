@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
-import AdminApi from "./AdminApi.js";
 import Spinner from "../../componets/Spinner.jsx";
 import {toast} from "react-toastify";
+import MyApi from "../../services/MyApi.js";
 
 const AdminShippingRulePage = () => {
     const [rules, setRules] = useState([]);
@@ -11,7 +11,7 @@ const AdminShippingRulePage = () => {
         const fetchData = async () => {
             try {
                 setIsLoading(true);
-                const res = await AdminApi.getShippingRule();
+                const res = await MyApi.getShippingRule();
                 setRules(res.data.data);
             } catch (err) {
                 console.log(err);
@@ -100,12 +100,13 @@ const AdminShippingRulePage = () => {
 
     const handleSave = async () => {
         if (!validateRules(rules)) {
+            toast.error("Giá cước không hợp lệ")
             return;
         }
         try {
             setIsLoading(true);
 
-            const res = await AdminApi.setShippingRule(fixLastRule(rules));
+            const res = await MyApi.setShippingRule(fixLastRule(rules));
             setRules(res.data.data);
             toast.success("Cập nhật thành công")
         } catch (err) {

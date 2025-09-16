@@ -1,7 +1,7 @@
 import React from 'react';
 import {Navigate, Outlet} from 'react-router-dom';
 import {AuthContext} from "../contexts/auth/AuthContext.jsx";
-import UnauthorizedPage from "../pages/public/UnauthorizedPage.jsx";
+import UnauthorizedPage from "../pages/public/page-direction/UnauthorizedPage.jsx";
 
 const RequireRole = ({ role }) => {
     const {state} = React.useContext(AuthContext);

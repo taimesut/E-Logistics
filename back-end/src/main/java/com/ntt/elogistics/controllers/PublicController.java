@@ -1,14 +1,12 @@
 package com.ntt.elogistics.controllers;
 
 import com.ntt.elogistics.dtos.goong.Location;
-import com.ntt.elogistics.dtos.requests.ChangePasswordRequest;
 import com.ntt.elogistics.helpers.ApiResponseFactory;
 import com.ntt.elogistics.repositories.ShippingRuleRepository;
 import com.ntt.elogistics.services.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

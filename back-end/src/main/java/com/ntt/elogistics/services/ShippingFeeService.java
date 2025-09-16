@@ -1,6 +1,6 @@
 package com.ntt.elogistics.services;
 
-import com.ntt.elogistics.dtos.responses.CheckFeeResponse;
+import com.ntt.elogistics.dtos.CheckFeeResponse;
 import com.ntt.elogistics.models.Parcel;
 import com.ntt.elogistics.models.ShippingRule;
 import com.ntt.elogistics.repositories.ShippingRuleRepository;

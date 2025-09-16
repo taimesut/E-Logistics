@@ -6,8 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.UUID;
 
-public interface ImageParcelRepository extends JpaRepository<ImageParcel,Long> {
+public interface ImageParcelRepository extends JpaRepository<ImageParcel, UUID> {
     @Query(
             value = "SELECT * FROM t_image_parcel " +
                     "WHERE parcel_id = :parcelId",

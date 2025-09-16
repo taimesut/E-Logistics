@@ -35,28 +35,25 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("""
             SELECT u FROM User u
-            WHERE u.role = :role
-              AND (
-                   LOWER(u.username) LIKE LOWER(CONCAT('%', :kw, '%'))
-                   OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :kw, '%'))
+            WHERE
+            (
+                    :kw IS NULL OR
+                     CAST(u.id AS string) LIKE CONCAT('%', :kw, '%') OR
+                     LOWER(u.branchWorkId) LIKE LOWER(CONCAT('%', :kw, '%')) OR
+                   LOWER(u.username) LIKE LOWER(CONCAT('%', :kw, '%')) OR
+                    LOWER(u.fullName) LIKE LOWER(CONCAT('%', :kw, '%'))
               )
+              AND (
+                :role IS NULL OR u.role = :role
+              )
+              AND (:status IS NULL OR u.status = :status)
             """)
-    Page<User> searchByRoleAndName(@Param("role") UserRole role,
-                                   @Param("kw") String keyword,
-                                   Pageable pageable);
-
-    @Query("""
-            SELECT u FROM User u
-            WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :kw, '%'))
-                   OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :kw, '%'))
-            """)
-    Page<User> searchByName(
+    Page<User> getAllCustom(@Param("role") UserRole role,
             @Param("kw") String keyword,
+                            @Param("status") UserStatus status,
             Pageable pageable);
 
-    long countByRole(UserRole role);
-
-    @Query("SELECT COUNT(u) FROM User u WHERE u.branchWorkId = :branchId AND u.role = 'SHIPPER' AND u.status = 'ACTIVE'")
-    long countActiveShippers(@Param("branchId") String branchId);
+    @Query("SELECT COUNT(u) FROM User u WHERE u.role = :role")
+    long countByRole(@Param("role") UserRole role);
 
 }

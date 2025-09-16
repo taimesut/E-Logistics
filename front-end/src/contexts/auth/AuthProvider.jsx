@@ -20,12 +20,12 @@ export const AuthProvider = ({children}) => {
             const response = await UserApi.getProfile();
 
             if (response.status === 200 && response.data?.data) {
-                const {id, username, fullName, role, email, phone, avatar, address, ward, district, province} = response.data.data;
+                const {id, username, fullName, role, email, phone, avatar, address, ward, district, province, branchWorkId} = response.data.data;
                 dispatch({
                     type: 'LOGIN',
                     payload: {
                         accessToken,
-                        user: {id, username, fullName, role, email, phone, avatar, address, ward, district, province}
+                        user: {id, username, fullName, role, email, phone, avatar, address, ward, district, province, branchWorkId}
                     }
                 });
             }

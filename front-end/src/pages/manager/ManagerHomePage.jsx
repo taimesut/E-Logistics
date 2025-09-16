@@ -1,21 +1,29 @@
-import React, {useEffect, useState} from 'react';
-import ManagerApi from "./ManagerApi.js";
-import Spinner from "../../componets/Spinner.jsx";
-import {useNavigate} from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
+import { Card, Row, Col, Typography, Spin } from "antd";
+import DashboardApi from "../../services/DashboardApi.js";
 
+const { Title, Text } = Typography;
 
-const StatCard = ({title, value, type, status}) => {
+const StatCard = ({ title, value, status }) => {
     const navigate = useNavigate();
+
     return (
-        <div className="col-md-3 col-sm-6 mb-3 btn" onClick={() => navigate(`/manager/parcel?type=${type}&status=${status}`)}>
-            <div className="card shadow-sm border-primary">
-                <div className="card-body text-center">
-                    <h6 className="card-title text-muted">{title}</h6>
-                    <h3 className="card-text text-primary fw-bold">{value}</h3>
-                </div>
-            </div>
-        </div>)
-}
+        <Col xs={24} sm={12} md={8} lg={6} style={{ marginBottom: 16 }}>
+            <Card
+                hoverable
+                bordered
+                onClick={() => navigate(`/manager/parcel?status=${status}`)}
+                style={{ textAlign: "center" }}
+            >
+                <Text type="secondary">{title}</Text>
+                <Title level={3} style={{ color: "#1890ff", marginTop: 8 }}>
+                    {value}
+                </Title>
+            </Card>
+        </Col>
+    );
+};
 
 const ManagerHomePage = () => {
     const [stats, setStats] = useState({});
@@ -24,7 +32,7 @@ const ManagerHomePage = () => {
     const fetchStatsFrom = async () => {
         try {
             setIsLoading(true);
-            const response = await ManagerApi.getStats();
+            const response = await DashboardApi.getManager();
             setStats(response?.data?.data);
             console.log(response?.data?.data);
         } catch (e) {
@@ -32,7 +40,7 @@ const ManagerHomePage = () => {
         } finally {
             setIsLoading(false);
         }
-    }
+    };
 
     useEffect(() => {
         fetchStatsFrom();
@@ -42,32 +50,58 @@ const ManagerHomePage = () => {
         }, 30000);
 
         return () => clearInterval(intervalId);
-    }, [])
+    }, []);
+
+    const statusConfig = [
+        { key: "CREATED", label: "Mới tạo" },
+        { key: "CANCELLED", label: "Đã hủy" },
+        { key: "PICKUP_IN_PROGRESS", label: "Đang lấy hàng" },
+        { key: "PICKUP_FAILED", label: "Lấy hàng thất bại" },
+        { key: "PICKUP_SUCCESS", label: "Lấy hàng thành công" },
+        { key: "IN_TRANSIT_TO_FROM_BRANCH", label: "Đang chuyển tới nơi lấy" },
+        { key: "AT_FROM_BRANCH", label: "Đến nơi lấy hàng" },
+        { key: "IN_TRANSIT_TO_TO_BRANCH", label: "Đang chuyển tới nơi giao" },
+        { key: "AT_TO_BRANCH", label: "Đến nơi giao hàng" },
+        { key: "DELIVERY_IN_PROGRESS", label: "Đang giao hàng" },
+        { key: "DELIVERY_FAILED", label: "Giao thất bại" },
+        { key: "DELIVERED", label: "Giao thành công" },
+        { key: "RETURNED", label: "Đã trả" },
+    ];
 
     if (isLoading) {
-        return <Spinner/>
+        return (
+            <Spin
+                tip="Đang tải..."
+                size="large"
+                style={{ display: "block", marginTop: 50 }}
+            />
+        );
     }
 
     return (
-        <div className="container my-4">
-            <div className="row">
-                <span>PICKUP</span>
-                <StatCard title={"Chưa gán nhân viên"} status={"CREATED"} type={"PICKUP"} value={stats.CREATED} />
-                <StatCard title={"Đang lấy"} status={"PICKUP_IN_PROGRESS"} type={"PICKUP"} value={stats.PICKUP_IN_PROGRESS} />
-                <StatCard title={"Lấy thành công"} status={"PICKUP_SUCCESS"} type={"PICKUP"} value={stats.PICKUP_SUCCESS} />
-                <StatCard title={"Lấy thất bại"} status={"PICKUP_FAILED"} type={"PICKUP"} value={stats.PICKUP_FAILED} />
-                <StatCard title={"Chưa chuyển đi"} status={"AT_FROM_BRANCH"} type={"PICKUP"} value={stats.AT_FROM_BRANCH} />
-                <StatCard title={"Đang chuyển đi"} status={"IN_TRANSIT_TO_TO_BRANCH"} type={"PICKUP"} value={stats.IN_TRANSIT_TO_TO_BRANCH} />
-                {/*<StatCard title={"Đã hủy"} status={"CANCELLED"} type={"PICKUP"} value={stats.CANCELLED} />*/}
-            </div>
-            <div className="row">
-                <span>DELIVERY</span>
-                <StatCard title={"Đang chuyển tới"} status={"IN_TRANSIT_TO_TO_BRANCH"} type={"DELIVERY"} value={stats.IN_TRANSIT_TO_TO_BRANCH} />
-                <StatCard title={"Chưa gán nhân viên"} status={"AT_TO_BRANCH"} type={"DELIVERY"} value={stats.AT_TO_BRANCH} />
-                <StatCard title={"Đang giao"} status={"DELIVERY_IN_PROGRESS"} type={"DELIVERY"} value={stats.DELIVERY_IN_PROGRESS} />
-                {/*<StatCard title={"Giao thành công"} status={"DELIVERED"} type={"DELIVERY"} value={stats.DELIVERED} />*/}
-                <StatCard title={"Giao thất bại"} status={"DELIVERY_FAILED"} type={"DELIVERY"} value={stats.DELIVERY_FAILED} />
-            </div>
+        <div style={{ padding: "24px" }}>
+            <Title
+                level={4}
+                style={{
+                    backgroundColor: "#1890ff",
+                    color: "#fff",
+                    textAlign: "center",
+                    padding: "8px 0",
+                    marginBottom: 24,
+                }}
+            >
+                Đơn hàng
+            </Title>
+            <Row gutter={[16, 16]}>
+                {statusConfig.map(({ key, label }) => (
+                    <StatCard
+                        key={key}
+                        title={label}
+                        value={stats[key] || 0}
+                        status={key}
+                    />
+                ))}
+            </Row>
         </div>
     );
 };

@@ -1,39 +1,44 @@
-import React, {useEffect, useState} from 'react';
-import AdminApi from "../admin/AdminApi.js";
-import {useNavigate} from "react-router-dom";
-import CustomerApi from "./CustomerApi.js";
-import Spinner from "../../componets/Spinner.jsx";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
+import { Card, Row, Col, Spin, Typography } from "antd";
+import DashboardApi from "../../services/DashboardApi.js";
 
-const StatCard = ({title, value, link}) => {
+const { Title, Text } = Typography;
+
+const StatCard = ({ title, value, status }) => {
     const navigate = useNavigate();
 
     return (
-        <div className="col-md-3 col-sm-6 mb-3 btn" onClick={() => navigate(link)}>
-            <div className="card shadow-sm border-primary">
-                <div className="card-body text-center">
-                    <h6 className="card-title text-muted">{title}</h6>
-                    <h3 className="card-text text-primary fw-bold">{value}</h3>
-                </div>
-            </div>
-        </div>)
-}
+        <Col xs={24} sm={12} md={8} lg={6} style={{ marginBottom: 16 }}>
+            <Card
+                hoverable
+                onClick={() => navigate(`/customer/parcel?status=${status}`)}
+                bordered={true}
+                style={{ textAlign: 'center' }}
+            >
+                <Text type="secondary">{title}</Text>
+                <Title level={3} style={{ color: '#1890ff', marginTop: 8 }}>{value}</Title>
+            </Card>
+        </Col>
+    );
+};
 
 const CustomerHomePage = () => {
     const [stats, setStats] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+
     useEffect(() => {
         const fetchData = async () => {
-            try{
+            try {
                 setIsLoading(true);
-                const res = await CustomerApi.getStats();
+                const res = await DashboardApi.getCustomer();
                 setStats(res?.data?.data);
-                console.log(res?.data?.data);
-            }catch(err){
+            } catch (err) {
                 console.log(err);
-            }finally {
+            } finally {
                 setIsLoading(false);
             }
-        }
+        };
         fetchData();
 
         const intervalId = setInterval(() => {
@@ -42,28 +47,42 @@ const CustomerHomePage = () => {
 
         return () => clearInterval(intervalId);
     }, []);
+
+    const statusConfig = [
+        { key: "CREATED", label: "Mới tạo" },
+        { key: "CANCELLED", label: "Đã hủy" },
+        { key: "PICKUP_IN_PROGRESS", label: "Đang lấy hàng" },
+        { key: "PICKUP_FAILED", label: "Lấy hàng thất bại" },
+        { key: "PICKUP_SUCCESS", label: "Lấy hàng thành công" },
+        { key: "AT_FROM_BRANCH", label: "Đến nơi lấy hàng" },
+        { key: "IN_TRANSIT_TO_FROM_BRANCH", label: "Đang chuyển tới nơi lấy" },
+        { key: "AT_TO_BRANCH", label: "Đến nơi giao hàng" },
+        { key: "IN_TRANSIT_TO_TO_BRANCH", label: "Đang chuyển tới nơi giao" },
+        { key: "DELIVERY_IN_PROGRESS", label: "Đang giao hàng" },
+        { key: "DELIVERY_FAILED", label: "Giao thất bại" },
+        { key: "DELIVERED", label: "Giao thành công" },
+        { key: "RETURNED", label: "Đã trả" },
+    ];
+
     if (isLoading) {
-        return <Spinner />;
+        return <Spin tip="Đang tải..." size="large" style={{ display: 'block', marginTop: 50 }} />;
     }
+
     return (
-        <div className="container my-4">
-            <div className="row">
-                <span>Đơn hàng</span>
-                <StatCard title={"Tổng số đơn"}  value={stats.SUM}/>
-                <StatCard title={"Mới tạo"}  value={stats.CREATED} link={"/customer/parcel?status=CREATED"} />
-                <StatCard title={"Đã hủy"}  value={stats.CANCELLED} link={"/customer/parcel?status=CANCELLED"} />
-                <StatCard title={"Đang lấy hàng"}  value={stats.PICKUP_IN_PROGRESS} link={"/customer/parcel?status=PICKUP_IN_PROGRESS"} />
-                <StatCard title={"Lấy hàng thất bại"}  value={stats.PICKUP_FAILED} link={"/customer/parcel?status=PICKUP_FAILED"} />
-                <StatCard title={"Lấy hàng thành công"}  value={stats.PICKUP_SUCCESS} link={"/customer/parcel?status=PICKUP_SUCCESS"} />
-                <StatCard title={"Đến nơi lấy hàng"}  value={stats.AT_FROM_BRANCH} link={"/customer/parcel?status=AT_FROM_BRANCH"} />
-                <StatCard title={"Đến nơi giao hàng"}  value={stats.AT_TO_BRANCH} link={"/customer/parcel?status=AT_TO_BRANCH"} />
-                <StatCard title={"Đang chuyển tới nơi giao"}  value={stats.IN_TRANSIT_TO_TO_BRANCH} link={"/customer/parcel?status=IN_TRANSIT_TO_TO_BRANCH"} />
-                <StatCard title={"Đang chuyển tới nơi lấy"}  value={stats.IN_TRANSIT_TO_FROM_BRANCH} link={"/customer/parcel?status=IN_TRANSIT_TO_FROM_BRANCH"} />
-                <StatCard title={"Đang giao hàng"}  value={stats.DELIVERY_IN_PROGRESS} link={"/customer/parcel?status=DELIVERY_IN_PROGRESS"} />
-                <StatCard title={"Giao thất bại"}  value={stats.DELIVERY_FAILED} link={"/customer/parcel?status=DELIVERY_FAILED"} />
-                <StatCard title={"Giao thành công"}  value={stats.DELIVERED} link={"/customer/parcel?status=DELIVERED"} />
-                <StatCard title={"Đã trả"}  value={stats.RETURNED} link={"/customer/parcel?status=RETURNED"} />
-            </div>
+        <div style={{ padding: '24px' }}>
+            <Title level={4} style={{ backgroundColor: '#1890ff', color: '#fff', textAlign: 'center', padding: '8px 0', marginBottom: 24 }}>
+                Đơn hàng
+            </Title>
+            <Row gutter={[16, 16]}>
+                {statusConfig.map(({ key, label }) => (
+                    <StatCard
+                        key={key}
+                        title={label}
+                        value={stats[key] || 0}
+                        status={key}
+                    />
+                ))}
+            </Row>
         </div>
     );
 };

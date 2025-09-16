@@ -5,7 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface ShippingRuleRepository extends JpaRepository<ShippingRule, Long> {
+import java.util.UUID;
+
+public interface ShippingRuleRepository extends JpaRepository<ShippingRule, UUID> {
     @Query("SELECT r FROM ShippingRule r " +
             "WHERE :weight > r.minWeight AND :weight <= r.maxWeight")
     ShippingRule findByWeight(@Param("weight") double weight);

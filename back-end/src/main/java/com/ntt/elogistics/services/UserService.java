@@ -1,7 +1,8 @@
 package com.ntt.elogistics.services;
 
-import com.ntt.elogistics.dtos.requests.ChangePasswordRequest;
-import com.ntt.elogistics.dtos.requests.CreateAccountRequest;
+import com.ntt.elogistics.dtos.ChangePasswordRequest;
+import com.ntt.elogistics.dtos.CreateAccountRequest;
+import com.ntt.elogistics.dtos.UpdateAccountRequest;
 import com.ntt.elogistics.enums.UserRole;
 import com.ntt.elogistics.enums.UserStatus;
 import com.ntt.elogistics.exceptions.CustomException;
@@ -28,19 +29,15 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ParcelRepository parcelRepository;
     private final FileUploadService fileUploadService;
 
     public User getProfileByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(NotFoundUsernameException::new);
     }
 
-    public Page<User> adminGetAccounts(int page, int size, String search, UserRole role) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        if(role!=null){
-            return userRepository.searchByRoleAndName(role,search, pageable);
-        }
-        return userRepository.searchByName(search,pageable);
+    public Page<User> getAllAccount(int page, int size, String search, UserRole role, UserStatus status) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("updateAt").descending());
+        return userRepository.getAllCustom(role,search,status,pageable);
     }
 
     public User adminCreateAccount(CreateAccountRequest request) {
@@ -64,41 +61,32 @@ public class UserService {
                 .toString();
     }
 
-    public User adminUpdateAccount(CreateAccountRequest request, Integer id) {
+    public User adminUpdateAccount(UpdateAccountRequest request, Integer id) {
         User u = adminGetAccountById(id);
 
         u.setFullName(request.getFullName());
         u.setStatus(request.getStatus());
-        u.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        if(userRepository.existsByEmail(request.getEmail()) && !request.getEmail().equals(u.getEmail())){
+            throw new CustomException("Email đã được sử dụng", HttpStatus.BAD_REQUEST);
+        }
+        if(userRepository.existsByPhone(request.getPhone()) && !request.getPhone().equals(u.getPhone())){
+            throw new CustomException("SĐT đã được sử dụng", HttpStatus.BAD_REQUEST);
+        }
+        u.setPhone(request.getPhone());
+        u.setEmail(request.getEmail());
+        u.setBranchWorkId(request.getBranchWorkId());
 
         return userRepository.save(u);
     }
 
-    public String getBranchIdByUsername(String username) {
-        return userRepository.findBranchWorkIdByUsername(username);
-    }
-
-    public List<User> managerGetShippers(Authentication authentication) {
+    public List<User> getShippersForBranch(Authentication authentication) {
         String branchWorkId = userRepository.findBranchWorkIdByUsername(authentication.getName());
         return userRepository.findByBranchWorkIdAndRoleAndStatus(branchWorkId, UserRole.ROLE_SHIPPER, UserStatus.ACTIVE);
     }
-    public User managerGetShipper(Long id, Authentication authentication){
-        User shipper = userRepository.findById(id.intValue())
+    public User getShipperById(Long id, Authentication authentication){
+        return userRepository.findById(id.intValue())
                 .orElseThrow(() -> new CustomException("Không tìm thấy user: " + id, HttpStatus.BAD_REQUEST));
-        if(shipper.getBranchWorkId().equals(getBranchIdByUsername(authentication.getName()))){
-            return shipper;
-        }
-        throw new CustomException("Khoong phu hop",HttpStatus.BAD_REQUEST);
-    }
-
-    public User customerGetShipper(Long id, Authentication authentication){
-        User shipper = userRepository.findById(id.intValue())
-                .orElseThrow(() -> new CustomException("Không tìm thấy user: " + id, HttpStatus.BAD_REQUEST));
-        if(parcelRepository.existsByUserIdAndPickupShipperId(getUserIdToStringFromAuthentication(authentication), id.toString())
-                || parcelRepository.existsByUserIdAndDeliveryShipperId(getUserIdToStringFromAuthentication(authentication), id.toString())){
-            return shipper;
-        }
-        throw new CustomException("Khoong phu hop",HttpStatus.BAD_REQUEST);
     }
 
     public void ChangePassword(ChangePasswordRequest request, Authentication authentication){
@@ -135,10 +123,6 @@ public class UserService {
         u.setProvince(province);
 
         return userRepository.save(u);
-    }
-
-    public long adminCountByRole(UserRole role){
-        return userRepository.countByRole(role);
     }
 
 }

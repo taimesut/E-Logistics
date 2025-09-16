@@ -1,6 +1,6 @@
 package com.ntt.elogistics.services;
 
-import com.ntt.elogistics.dtos.responses.LoginResponse;
+import com.ntt.elogistics.dtos.LoginResponse;
 import com.ntt.elogistics.exceptions.CustomException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;

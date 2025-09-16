@@ -2,10 +2,12 @@ package com.ntt.elogistics.services;
 
 import com.ntt.elogistics.enums.UserStatus;
 import com.ntt.elogistics.exceptions.AccountLockedException;
+import com.ntt.elogistics.exceptions.CustomException;
 import com.ntt.elogistics.exceptions.NotFoundUsernameException;
 import com.ntt.elogistics.models.User;
 import com.ntt.elogistics.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,7 +28,7 @@ public class CustomUserDetailService implements UserDetailsService {
         User user = userRepository.findByUsername(username).orElseThrow(NotFoundUsernameException::new);
 
         if(user.getStatus()== UserStatus.LOCKED){
-            throw new AccountLockedException();
+            throw new CustomException("Tài khoản đã bị khóa", HttpStatus.BAD_REQUEST);
         }
 
         return new org.springframework.security.core.userdetails.User(

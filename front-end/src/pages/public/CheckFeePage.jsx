@@ -1,9 +1,12 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
+import { Form, Input, InputNumber, Button, Select, Card, Row, Col, Divider, Spin, Typography } from 'antd';
 import LocationApi from "../../services/LocationApi.js";
-import CustomerApi from "../customer/CustomerApi.js";
-import {toast} from "react-toastify";
 import PublicApi from "./PublicApi.js";
 import Spinner from "../../componets/Spinner.jsx";
+import { toast } from "react-toastify";
+
+const { Option } = Select;
+const { Title, Text } = Typography;
 
 const CheckFeePage = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -22,7 +25,7 @@ const CheckFeePage = () => {
         length: 1,
         width: 1,
         height: 1,
-    })
+    });
     const [formResponse, setFormResponse] = useState(null);
     const [provinces, setProvinces] = useState([]);
 
@@ -47,120 +50,62 @@ const CheckFeePage = () => {
         fetchProvinces();
     }, []);
 
-    const handleFromProvinceChange = async (e) => {
-        const selectedOption = e.target.selectedOptions[0];
-        const id = selectedOption.getAttribute('data-id');
-        const name = e.target.name;
-        const value = e.target.value;
-
+    const handleFromProvinceChange = async (value, option) => {
+        const id = option['data-id'];
         try {
             const res = await LocationApi.getDistricts(id);
             if (res.code === 'success') {
                 setFromDistricts(res.data);
-                setForm((prevState) => ({
-                    ...prevState,
-                    [name]: value,
-                    fromDistrict: '',
-                    fromWard: '',
-                }))
+                setFromWards([]);
+                setForm(prev => ({ ...prev, fromProvince: value, fromDistrict: '', fromWard: '' }));
             }
         } catch (err) {
             console.error(err);
-        } finally {
-            setFromWards([]);
         }
     }
-    const handleFromDistrictChange = async (e) => {
-        const selectedOption = e.target.selectedOptions[0];
-        const id = selectedOption.getAttribute('data-id');
-        const name = e.target.name;
-        const value = e.target.value;
 
+    const handleFromDistrictChange = async (value, option) => {
+        const id = option['data-id'];
         try {
             const res = await LocationApi.getWards(id);
             if (res.code === 'success') {
                 setFromWards(res.data);
-                setForm((prevState) => ({
-                    ...prevState,
-                    [name]: value,
-                    fromWard: '',
-                }))
+                setForm(prev => ({ ...prev, fromDistrict: value, fromWard: '' }));
             }
         } catch (err) {
             console.error(err);
         }
     }
-    const handleToProvinceChange = async (e) => {
-        const selectedOption = e.target.selectedOptions[0];
-        const id = selectedOption.getAttribute('data-id');
-        const name = e.target.name;
-        const value = e.target.value;
 
+    const handleToProvinceChange = async (value, option) => {
+        const id = option['data-id'];
         try {
             const res = await LocationApi.getDistricts(id);
             if (res.code === 'success') {
                 setToDistricts(res.data);
-                setForm((prevState) => ({
-                    ...prevState,
-                    [name]: value,
-                    toDistrict: '',
-                    toWard: '',
-                }))
+                setToWards([]);
+                setForm(prev => ({ ...prev, toProvince: value, toDistrict: '', toWard: '' }));
             }
         } catch (err) {
             console.error(err);
-        } finally {
-            setToWards([]);
         }
     }
-    const handleToDistrictChange = async (e) => {
-        const selectedOption = e.target.selectedOptions[0];
-        const id = selectedOption.getAttribute('data-id');
-        const name = e.target.name;
-        const value = e.target.value;
 
+    const handleToDistrictChange = async (value, option) => {
+        const id = option['data-id'];
         try {
             const res = await LocationApi.getWards(id);
             if (res.code === 'success') {
                 setToWards(res.data);
-                setForm((prevState) => ({
-                    ...prevState,
-                    [name]: value,
-                    toWard: '',
-                }))
+                setForm(prev => ({ ...prev, toDistrict: value, toWard: '' }));
             }
         } catch (err) {
             console.error(err);
         }
     }
 
-    const handleFormChange = (e) => {
-        const {name, value} = e.target;
-        setForm((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
-
-
-    const handleInputLimit = (e, min = 0, max = 50) => {
-        let value = e.target.value;
-        if (value > max) {
-            e.target.value = max;
-        }
-        if (value < min) {
-            e.target.value = min;
-        }
-    };
-
-    const [checkFeeData, setCheckFeeData] = useState({
-        shippingFee: 0,
-        weightChargeable: 0,
-    });
-
     const handleCheckFee = async () => {
         try {
-
             const data = {
                 weight: form.weight,
                 length: form.length,
@@ -176,151 +121,174 @@ const CheckFeePage = () => {
         }
     }
 
-    if (isLoading) {
-        return <Spinner/>
-    }
+    if (isLoading) return <Spinner />
 
     return (
-        <div className="d-flex align-items-center justify-content-center py-5 bg-light">
-            <div className="card p-4 shadow" style={{maxWidth: '1200px'}}>
-                <h3 className="mb-3 text-center">Tạo đơn</h3>
-                <form className="p-4 border rounded bg-light" onSubmit={(e) => {
-                    e.preventDefault();
-                    handleCheckFee();
-                }}>
-                    <h5 className="mb-3">Địa chỉ gửi</h5>
-                    <div className="mb-3">
-                        <label className="form-label">Địa chỉ cụ thể</label>
-                        <input type="text" className="form-control" name="fromStreet" onChange={handleFormChange}
-                               value={form.fromStreet} placeholder="123 đường ABC..." required/>
-                    </div>
-                    <div className="row mb-3">
-                        <div className="col-md-4">
-                            <label className="form-label">Tỉnh/Thành phố</label>
-                            <select className="form-control" name="fromProvince"
-                                    onChange={handleFromProvinceChange} value={form.fromProvince} required>
-                                <option disabled value={""}>Chọn</option>
-                                {provinces.map((province) => (
-                                    <option key={province.id} value={province.name}
-                                            data-id={province.id}>{province.name}</option>
-                                ))}
-                            </select>
-                        </div>
+        <div style={{ padding: '50px', display: 'flex', justifyContent: 'center', background: '#f5f5f5' }}>
+            <Card style={{ width: '100%', maxWidth: 1200 }}>
+                <Title level={3} style={{ textAlign: 'center', marginBottom: 24 }}>Tra Giá</Title>
+                <Form layout="vertical" onFinish={handleCheckFee}>
+                    <Divider>Địa chỉ gửi</Divider>
+                    <Row gutter={16}>
+                        <Col span={24}>
+                            <Form.Item label="Địa chỉ cụ thể" required>
+                                <Input
+                                    name="fromStreet"
+                                    placeholder="123 đường ABC..."
+                                    value={form.fromStreet}
+                                    onChange={(e) => setForm(prev => ({ ...prev, fromStreet: e.target.value }))}
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item label="Tỉnh/Thành phố" required>
+                                <Select
+                                    placeholder="Chọn"
+                                    value={form.fromProvince || undefined}
+                                    onChange={handleFromProvinceChange}
+                                >
+                                    {provinces.map(p => (
+                                        <Option key={p.id} value={p.name} data-id={p.id}>{p.name}</Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item label="Quận/Huyện" required>
+                                <Select
+                                    placeholder="Chọn"
+                                    value={form.fromDistrict || undefined}
+                                    onChange={handleFromDistrictChange}
+                                >
+                                    {fromDistricts.map(d => (
+                                        <Option key={d.id} value={d.name} data-id={d.id}>{d.name}</Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item label="Phường/Xã" required>
+                                <Select
+                                    placeholder="Chọn"
+                                    value={form.fromWard || undefined}
+                                    onChange={(value) => setForm(prev => ({ ...prev, fromWard: value }))}
+                                >
+                                    {fromWards.map(w => (
+                                        <Option key={w.id} value={w.name} data-id={w.id}>{w.name}</Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                    </Row>
 
-                        <div className="col-md-4">
-                            <label className="form-label">Quận/Huyện</label>
-                            <select className="form-control" name="fromDistrict"
-                                    onChange={handleFromDistrictChange} value={form.fromDistrict} required>
-                                <option disabled value={""}>Chọn</option>
-                                {fromDistricts.map((district) => (
-                                    <option key={district.id} value={district.name}
-                                            data-id={district.id}>{district.name}</option>
-                                ))}
-                            </select>
-                        </div>
+                    <Divider>Địa chỉ nhận</Divider>
+                    <Row gutter={16}>
+                        <Col span={24}>
+                            <Form.Item label="Địa chỉ cụ thể" required>
+                                <Input
+                                    name="toStreet"
+                                    placeholder="123 đường ABC..."
+                                    value={form.toStreet}
+                                    onChange={(e) => setForm(prev => ({ ...prev, toStreet: e.target.value }))}
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item label="Tỉnh/Thành phố" required>
+                                <Select
+                                    placeholder="Chọn"
+                                    value={form.toProvince || undefined}
+                                    onChange={handleToProvinceChange}
+                                >
+                                    {provinces.map(p => (
+                                        <Option key={p.id} value={p.name} data-id={p.id}>{p.name}</Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item label="Quận/Huyện" required>
+                                <Select
+                                    placeholder="Chọn"
+                                    value={form.toDistrict || undefined}
+                                    onChange={handleToDistrictChange}
+                                >
+                                    {toDistricts.map(d => (
+                                        <Option key={d.id} value={d.name} data-id={d.id}>{d.name}</Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item label="Phường/Xã" required>
+                                <Select
+                                    placeholder="Chọn"
+                                    value={form.toWard || undefined}
+                                    onChange={(value) => setForm(prev => ({ ...prev, toWard: value }))}
+                                >
+                                    {toWards.map(w => (
+                                        <Option key={w.id} value={w.name} data-id={w.id}>{w.name}</Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                    </Row>
 
-                        <div className="col-md-4">
-                            <label className="form-label">Phường/Xã</label>
-                            <select className="form-control" name="fromWard" onChange={handleFormChange}
-                                    value={form.fromWard} required>
-                                <option disabled value={""}>Chọn</option>
-                                {fromWards.map((ward) => (
-                                    <option key={ward.id} value={ward.name} data-id={ward.id}>{ward.name}</option>
-                                ))}
-                            </select>
-                        </div>
+                    <Divider>Thông tin kiện hàng</Divider>
+                    <Row gutter={16}>
+                        <Col span={6}>
+                            <Form.Item label="Khối lượng (kg)" required>
+                                <InputNumber
+                                    min={0.1} max={50} step={0.1} style={{ width: '100%' }}
+                                    value={form.weight}
+                                    onChange={(value) => setForm(prev => ({ ...prev, weight: value }))}
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={6}>
+                            <Form.Item label="Chiều dài (cm)" required>
+                                <InputNumber
+                                    min={1} max={150} step={1} style={{ width: '100%' }}
+                                    value={form.length}
+                                    onChange={(value) => setForm(prev => ({ ...prev, length: value }))}
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={6}>
+                            <Form.Item label="Chiều rộng (cm)" required>
+                                <InputNumber
+                                    min={1} max={150} step={1} style={{ width: '100%' }}
+                                    value={form.width}
+                                    onChange={(value) => setForm(prev => ({ ...prev, width: value }))}
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={6}>
+                            <Form.Item label="Chiều cao (cm)" required>
+                                <InputNumber
+                                    min={1} max={150} step={1} style={{ width: '100%' }}
+                                    value={form.height}
+                                    onChange={(value) => setForm(prev => ({ ...prev, height: value }))}
+                                />
+                            </Form.Item>
+                        </Col>
+                    </Row>
 
-                    </div>
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit" block>
+                            Tra giá
+                        </Button>
+                    </Form.Item>
+                </Form>
 
-                    <h5 className="mt-4 mb-3">Địa chỉ nhận</h5>
-                    <div className="mb-3">
-                        <label className="form-label">Địa chỉ cụ thể</label>
-                        <input type="text" className="form-control" name="toStreet"
-                               onChange={handleFormChange} value={form.toStreet} required/>
-                    </div>
-                    <div className="row mb-3">
-                        <div className="col-md-4">
-                            <label className="form-label">Tỉnh/Thành phố</label>
-                            <select className="form-control" name="toProvince"
-                                    onChange={handleToProvinceChange} value={form.toProvince} required>
-                                <option disabled value={""}>Chọn</option>
-                                {provinces.map((province) => (
-                                    <option key={province.id} value={province.name}
-                                            data-id={province.id}>{province.name}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="col-md-4">
-                            <label className="form-label">Quận/Huyện</label>
-                            <select className="form-control" name="toDistrict"
-                                    onChange={handleToDistrictChange} value={form.toDistrict} required>
-                                <option disabled value={""}>Chọn</option>
-                                {toDistricts.map((district) => (
-                                    <option key={district.id} value={district.name}
-                                            data-id={district.id}>{district.name}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="col-md-4">
-                            <label className="form-label">Phường/Xã</label>
-                            <select className="form-control" name="toWard" value={form.toWard}
-                                    onChange={handleFormChange} required>
-                                <option disabled value={""}>Chọn</option>
-                                {toWards.map((ward) => (
-                                    <option key={ward.id} value={ward.name} data-id={ward.id}>{ward.name}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                    </div>
-
-                    <h5 className="mt-4 mb-3">Thông tin kiện hàng</h5>
-                    <div className="row mb-3">
-                        <div className="col-md-3">
-                            <label className="form-label">Khối lượng (kg)</label>
-                            <input type="number" step="0.1" className="form-control" name="weight"
-                                   value={form.weight} required onChange={handleFormChange}
-                                   onInput={(e) => handleInputLimit(e, 0.1, 20)}/>
-                        </div>
-                        <div className="col-md-3">
-                            <label className="form-label">Chiều dài (cm)</label>
-                            <input type="number" step="1" className="form-control" name="length" value={form.length}
-                                   required onChange={handleFormChange}
-                                   onInput={(e) => handleInputLimit(e, 1, 30)}/>
-                        </div>
-                        <div className="col-md-3">
-                            <label className="form-label">Chiều rộng (cm)</label>
-                            <input type="number" step="1" className="form-control" name="width" value={form.width}
-                                   required onChange={handleFormChange}
-                                   onInput={(e) => handleInputLimit(e, 1, 30)}/>
-                        </div>
-                        <div className="col-md-3">
-                            <label className="form-label">Chiều cao (cm)</label>
-                            <input type="number" step="1" className="form-control" name="height" value={form.height}
-                                   required onChange={handleFormChange}
-                                   onInput={(e) => handleInputLimit(e, 1, 30)}/>
-                        </div>
-                    </div>
-                    <div className="d-grid mt-4">
-                        <button className="btn btn-primary">Tra giá</button>
-                    </div>
-
-                </form>
-                {
-                    formResponse !== null && <>
-                    <div className="p-3 border rounded-3 bg-light mt-3">
-                        <small className="text-muted">Ước tính chi phí</small>
-                        <p className="mb-0 fw-semibold">Khối lượng tính phí: {formResponse.weightChargeable}</p>
-                        <p className="mb-0 fw-semibold">Tổng chi phí: {formResponse.shippingFee}</p>
-                    </div>
-                </>
-                }
-
-
-
-            </div>
-
+                {formResponse && (
+                    <Card style={{ marginTop: 20, background: '#fafafa' }}>
+                        <Text type="secondary">Ước tính chi phí</Text>
+                        <p className="mb-0 fw-semibold">Khối lượng tính phí: {formResponse.weightChargeable} kg</p>
+                        <p className="mb-0 fw-semibold">Tổng chi phí: {formResponse.shippingFee.toLocaleString()} đ</p>
+                    </Card>
+                )}
+            </Card>
         </div>
     );
 };

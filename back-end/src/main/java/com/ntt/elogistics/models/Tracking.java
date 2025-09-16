@@ -3,8 +3,11 @@ package com.ntt.elogistics.models;
 import com.ntt.elogistics.enums.ParcelStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -15,28 +18,31 @@ import java.time.LocalDateTime;
 @Table(name = "t_tracking")
 public class Tracking {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
+    @PrePersist
+    public void prePersist() {
+        if (id == null) {
+            id = UUID.randomUUID();
+        }
+    }
 
     @Column(nullable = false)
     private String parcelId;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ParcelStatus status;
-
-    private LocalDateTime updateAt;
 
     private String description;
 
-    @PrePersist
-    public void prePersist() {
-        this.updateAt = LocalDateTime.now();
-    }
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updateAt;
 
-    @PreUpdate
-    public void preUpdate() {
-        this.updateAt = LocalDateTime.now();
-    }
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
 
 
 }

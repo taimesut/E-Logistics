@@ -1,8 +1,8 @@
 package com.ntt.elogistics.controllers;
 
-import com.ntt.elogistics.dtos.requests.LoginRequest;
-import com.ntt.elogistics.dtos.responses.LoginResponse;
-import com.ntt.elogistics.dtos.requests.RegisterRequest;
+import com.ntt.elogistics.dtos.LoginRequest;
+import com.ntt.elogistics.dtos.LoginResponse;
+import com.ntt.elogistics.dtos.RegisterRequest;
 import com.ntt.elogistics.helpers.ApiResponseFactory;
 import com.ntt.elogistics.services.AuthService;
 import com.ntt.elogistics.services.PasswordResetService;

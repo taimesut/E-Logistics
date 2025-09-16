@@ -1,26 +1,34 @@
 package com.ntt.elogistics.services;
 
 import com.ntt.elogistics.dtos.goong.Location;
-import com.ntt.elogistics.dtos.requests.CreateParcelRequest;
+import com.ntt.elogistics.dtos.CreateParcelRequest;
 import com.ntt.elogistics.enums.ParcelStatus;
 import com.ntt.elogistics.exceptions.CustomException;
 import com.ntt.elogistics.exceptions.NotFoundParcel;
 import com.ntt.elogistics.exceptions.NotFoundUsernameException;
 import com.ntt.elogistics.models.Parcel;
+import com.ntt.elogistics.models.Product;
+import com.ntt.elogistics.models.ProductParcel;
 import com.ntt.elogistics.models.User;
 import com.ntt.elogistics.repositories.ParcelRepository;
+import com.ntt.elogistics.repositories.ProductParcelRepository;
+import com.ntt.elogistics.repositories.ProductRepository;
 import com.ntt.elogistics.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -29,12 +37,15 @@ import java.util.stream.Collectors;
 public class ParcelService {
     private final ParcelRepository parcelRepository;
     private final UserRepository userRepository;
+    private final ProductRepository productRepository;
+    private final ProductParcelRepository productParcelRepository;
 
     private final TrackingService trackingService;
     private final GoongService goongService;
     private final ShippingFeeService shippingFeeService;
     private final AssignmentBranchService assignmentBranchService;
     private final MailService mailService;
+    private final ProductParcelService productParcelService;
 
 
     public Parcel customerCreateParcel(CreateParcelRequest request, Authentication authentication) {
@@ -52,8 +63,8 @@ public class ParcelService {
         parcel.setStatus(ParcelStatus.CREATED);
 
         // set assignment branch
-        String toBranchId = assignmentBranchService.getFromBranchIdAutoAssignment(parcel);
-        String fromBranchId = assignmentBranchService.getToBranchIdAutoAssignment(parcel);
+        String fromBranchId = assignmentBranchService.getFromBranchIdAutoAssignment(parcel);
+        String toBranchId = assignmentBranchService.getToBranchIdAutoAssignment(parcel);
 
         parcel.setToBranchId(toBranchId);
         parcel.setFromBranchId(fromBranchId);
@@ -84,38 +95,22 @@ public class ParcelService {
 
         // tracking
         trackingService.createTracking(savedId, ParcelStatus.CREATED);
+        productParcelService.createProductParcel(savedId, request.getProducts(), authentication);
         User u = userRepository.findByUsername(authentication.getName()).orElseThrow(NotFoundUsernameException::new);
-        mailService.sendSimpleMail(u.getEmail(), "Tạo đơn hàng thành công", "Mã tracking: " + saved.getId().toString());
+        mailService.sendSimpleMail(u.getEmail(),
+                "Tạo đơn hàng thành công",
+                """
+                        Xin chào %s,
+                        
+                        Đơn hàng của bạn đã được tạo thành công.
+                        Mã tracking: %s
+                        
+                        Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!
+                        """.formatted(u.getFullName(), saved.getId())
+        );
 
         return saved;
     }
-
-    public Parcel customerGetParcelById(Long id, Authentication authentication) {
-        Parcel parcel = getParcelById(id);
-        if (parcel.getUserId().equals(getUserIdToStringFromAuthentication(authentication))) {
-            return parcel;
-        }
-        throw new CustomException("Id không phù hợp", HttpStatus.BAD_REQUEST);
-    }
-
-    public Parcel customerCancelParcelById(Long id, Authentication authentication) {
-        Parcel parcel = getParcelById(id);
-        if (parcel.getUserId().equals(getUserIdToStringFromAuthentication(authentication))) {
-            parcel.setStatus(ParcelStatus.CANCELLED);
-            trackingService.createTracking(parcel.getId().toString(), ParcelStatus.CANCELLED);
-            return parcelRepository.save(parcel);
-        }
-        throw new CustomException("Id không phù hợp", HttpStatus.BAD_REQUEST);
-    }
-
-    public Page<Parcel> customerGetParcelsPage(int page, int size, ParcelStatus status, String search, Authentication authentication) {
-        String customerId = getUserIdToStringFromAuthentication(authentication);
-        if (status != null) {
-            return parcelRepository.findByUserIdAndStatus(customerId, status, search, PageRequest.of(page, size));
-        }
-        return parcelRepository.findByUserId(customerId, search, PageRequest.of(page, size));
-    }
-
 
     public String getUserIdToStringFromAuthentication(Authentication authentication) {
         return userRepository.findIdByUsername(authentication.getName())
@@ -123,148 +118,102 @@ public class ParcelService {
                 .toString();
     }
 
-    public Parcel getParcelById(Long id) {
+    public String getRoleFromAuthentication(Authentication authentication) {
+        return authentication.getAuthorities().iterator().next().getAuthority();
+    }
+
+    public String getBranchWorkFromAuthentication(Authentication authentication) {
+        return userRepository.findBranchWorkIdByUsername(authentication.getName());
+    }
+
+    public Page<Parcel> getParcelPage(int page, int size, ParcelStatus status, String search, Authentication authentication) {
+        String userId = getUserIdToStringFromAuthentication(authentication);
+        String role = getRoleFromAuthentication(authentication);
+        String branchId = "";
+        Pageable pageable = PageRequest.of(page, size, Sort.by("updateAt").descending());
+        if(role.equals("ROLE_MANAGER")){
+            branchId = getBranchWorkFromAuthentication(authentication);
+        }
+
+        return parcelRepository.findAllCustom(userId, branchId, search, status, pageable);
+    }
+
+    private Parcel getParcelById(UUID id) {
         return parcelRepository.findById(id).orElseThrow(() -> new NotFoundParcel(id.toString()));
     }
 
-
-    public Page<Parcel> shipperGetParcelsPage(int page, int size, String type, ParcelStatus status, String search, Authentication authentication) {
-        String shipperId = getUserIdToStringFromAuthentication(authentication);
-        if ("pickup".equalsIgnoreCase(type)) {
-            if (status != null) {
-                return parcelRepository.findByPickupShipperIdAndStatus(shipperId, status, search, PageRequest.of(page, size));
-            }
-            return parcelRepository.findByPickupShipperId(shipperId, search, PageRequest.of(page, size));
-        } else if ("delivery".equalsIgnoreCase(type)) {
-            if (status != null) {
-                return parcelRepository.findByDeliveryShipperIdAndStatus(shipperId, status, search, PageRequest.of(page, size));
-            }
-            return parcelRepository.findByDeliveryShipperId(shipperId, search, PageRequest.of(page, size));
-        }
-        return Page.empty();
-    }
-
-    public Parcel shipperGetParcelById(Long id, Authentication authentication) {
+    public Parcel getParcelById(UUID id, Authentication authentication) {
         Parcel parcel = getParcelById(id);
-        String userId = getUserIdToStringFromAuthentication(authentication);
-        if (Objects.equals(userId, parcel.getDeliveryShipperId())
-                || Objects.equals(userId, parcel.getPickupShipperId())) {
+        String customerId = getUserIdToStringFromAuthentication(authentication);
+        // check customer or shipper
+        if (parcel.getUserId().equals(customerId) ||
+                (parcel.getDeliveryShipperId() != null  && parcel.getDeliveryShipperId().equals(customerId)) ||
+                (parcel.getPickupShipperId() != null && parcel.getPickupShipperId().equals(customerId))) {
             return parcel;
         }
-        throw new CustomException("Yêu cầu không phù hợp shipperGetParcelById", HttpStatus.BAD_REQUEST);
+        String branchId = getBranchWorkFromAuthentication(authentication);
+        // check manager
+        if ( (parcel.getFromBranchId() != null && parcel.getFromBranchId().equals(branchId)) ||
+                (parcel.getToBranchId() != null  && parcel.getToBranchId().equals(branchId))) {
+            return parcel;
+        }
+        // check admin
+        if(getRoleFromAuthentication(authentication).equals("ADMIN")){
+            return parcel;
+        }
+        throw new CustomException("Không có quyền truy cập tài nguyên này", HttpStatus.FORBIDDEN);
     }
 
-    public Parcel shipperUpdateStatusParcel(Long id, ParcelStatus status, Authentication authentication) {
+    public Parcel updateParcelById(UUID id,
+                                   ParcelStatus status,
+                                   String shipperId,
+                                   String typeShipper,
+                                   Authentication authentication){
         Parcel parcel = getParcelById(id);
-        String userId = getUserIdToStringFromAuthentication(authentication);
-        User u = userRepository.findByUsername(authentication.getName()).orElseThrow(NotFoundUsernameException::new);
-        if (Objects.equals(userId, parcel.getDeliveryShipperId())
-                || Objects.equals(userId, parcel.getPickupShipperId())) {
+
+        if(status != null){
             parcel.setStatus(status);
-            Parcel saved = parcelRepository.save(parcel);
-            trackingService.createTracking(saved.getId().toString(), status);
-            if(status==ParcelStatus.DELIVERED){
-                mailService.sendSimpleMail(u.getEmail(), "Đơn hàng đã được giao", "Đơn hàng có mã tracking: " + saved.getId().toString() + " đã được giao cho người nhận");
+        }
 
+        // khi gán shipper sẽ tự động set trạng thái
+        if(typeShipper!=null && shipperId != null){
+            if(typeShipper.equals("pickup")){
+                parcel.setPickupShipperId(shipperId);
+                parcel.setStatus(ParcelStatus.PICKUP_IN_PROGRESS);
+            }else if (typeShipper.equals("delivery")){
+                parcel.setDeliveryShipperId(shipperId);
+                parcel.setStatus(ParcelStatus.DELIVERY_IN_PROGRESS);
             }
-            return saved;
         }
-        throw new CustomException("Yêu cầu không phù hợp shipperUpdateStatusParcel", HttpStatus.BAD_REQUEST);
-    }
 
-
-    public Page<Parcel> managerGetParcelsPage(int page, int size, String type, ParcelStatus status, String search, Authentication authentication) {
-        String branchId = userRepository.findBranchWorkIdByUsername(authentication.getName());
-        if ("pickup".equalsIgnoreCase(type)) {
-            if (status != null) {
-                return parcelRepository.findByFromBranchIdAndStatus(branchId, status, search, PageRequest.of(page, size));
-            }
-            return parcelRepository.findByFromBranchId(branchId, search, PageRequest.of(page, size));
-        } else if ("delivery".equalsIgnoreCase(type)) {
-            if (status != null) {
-                return parcelRepository.findByToBranchIdAndStatus(branchId, status, search, PageRequest.of(page, size));
-            }
-            return parcelRepository.findByToBranchId(branchId, search, PageRequest.of(page, size));
-        }
-        return Page.empty();
-    }
-
-    public Parcel managerGetParcelById(Long id, Authentication authentication) {
-        Parcel parcel = getParcelById(id);
-        String branchId = userRepository.findBranchWorkIdByUsername(authentication.getName());
-        if (Objects.equals(branchId, parcel.getFromBranchId())
-                || Objects.equals(branchId, parcel.getToBranchId())) {
-            return parcel;
-        }
-        throw new CustomException("Yêu cầu không phù hợp managerGetParcelById", HttpStatus.BAD_REQUEST);
-    }
-
-    public Parcel managerSetShipper(Long id, int shipperId, String type) {
-        Parcel parcel = getParcelById(id);
-        if ("delivery".equalsIgnoreCase(type)) {
-            parcel.setDeliveryShipperId(String.valueOf(shipperId));
-            parcel.setStatus(ParcelStatus.DELIVERY_IN_PROGRESS);
-            trackingService.createTracking(String.valueOf(parcel.getId()), ParcelStatus.DELIVERY_IN_PROGRESS);
-        } else if ("pickup".equalsIgnoreCase(type)) {
-            parcel.setPickupShipperId(String.valueOf(shipperId));
-            parcel.setStatus(ParcelStatus.PICKUP_IN_PROGRESS);
-            trackingService.createTracking(String.valueOf(parcel.getId()), ParcelStatus.PICKUP_IN_PROGRESS);
-
-        } else {
-            throw new CustomException("Yêu cầu không phù hợp managerSetShipper", HttpStatus.BAD_REQUEST);
-        }
-        return parcelRepository.save(parcel);
-    }
-
-    public Parcel managerSetStatusParcel(Long id, ParcelStatus status, Authentication authentication) {
-        Parcel parcel = getParcelById(id);
-        parcel.setStatus(status);
         Parcel saved = parcelRepository.save(parcel);
-        trackingService.createTracking(String.valueOf(parcel.getId()), status);
+
+        // khi gán shipper sẽ tự động set trạng thái
+        if(typeShipper!=null && shipperId != null){
+            if(typeShipper.equals("pickup")){
+                trackingService.createTracking(saved.getId().toString(),ParcelStatus.PICKUP_IN_PROGRESS);
+            }else if (typeShipper.equals("delivery")){
+                trackingService.createTracking(saved.getId().toString(),ParcelStatus.DELIVERY_IN_PROGRESS);
+            }
+        }
+
+        if(status != null){
+            trackingService.createTracking(saved.getId().toString(),status);
+            if (status == ParcelStatus.RETURNED) {
+                List<ProductParcel> productParcels = productParcelRepository.findByParcelId(saved.getId().toString());
+                for (ProductParcel pp : productParcels) {
+                    Product product = productRepository.findById(UUID.fromString(pp.getProductId()))
+                            .orElseThrow(() -> new RuntimeException("Product not found"));
+
+                    product.setQuantity(product.getQuantity() + pp.getQuantity());
+                    productRepository.save(product);
+                }
+            }
+        }
         return saved;
     }
 
-    public Map<String, Long> countByStatusFromOrToBranch(Authentication authentication) {
-        String branchId = userRepository.findBranchWorkIdByUsername(authentication.getName());
-        List<Object[]> results = parcelRepository.countByStatusFromOrToBranch(branchId);
-        Map<String, Long> stats = results.stream()
-                .collect(Collectors.toMap(
-                        row -> row[0].toString(),
-                        row -> (Long) row[1]
-                ));
 
-        for (ParcelStatus status : ParcelStatus.values()) {
-            stats.putIfAbsent(status.name(), 0L);
-        }
-
-        return stats;
-    }
-
-    public Map<String, Long> countByStatusPickupOrDeliveryShipperId(Authentication authentication) {
-        String branchId = getUserIdToStringFromAuthentication(authentication);
-        List<Object[]> results = parcelRepository.countByStatusPickupOrDeliveryShipperId(branchId);
-        Map<String, Long> stats = results.stream()
-                .collect(Collectors.toMap(
-                        row -> row[0].toString(),
-                        row -> (Long) row[1]
-                ));
-
-        for (ParcelStatus status : ParcelStatus.values()) {
-            stats.putIfAbsent(status.name(), 0L);
-        }
-
-        return stats;
-    }
-
-    public long customerCountParcel(Authentication authentication) {
-        String userId = getUserIdToStringFromAuthentication(authentication);
-        return parcelRepository.countByUserId(userId);
-    }
-
-    public long customerCountParcelByStatus(Authentication authentication, ParcelStatus status) {
-        String userId = getUserIdToStringFromAuthentication(authentication);
-        return parcelRepository.countParcelsByUserIdAndStatus(userId, status);
-    }
 
 }
 
